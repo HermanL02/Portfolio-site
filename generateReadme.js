@@ -113,13 +113,15 @@ class ReadmeGenerator {
 
     for (const item of items) {
       if (typeof item === 'string') {
-        // Simple string items (education, current work, learning, fun facts)
+        // Simple string items (legacy)
         markdown += `- ${this.formatText(item)}\n`;
       } else if (typeof item === 'object') {
         if (fileName.includes('project')) {
           markdown += this.renderProjectItem(item);
         } else if (fileName.includes('experience')) {
           markdown += this.renderExperienceItem(item);
+        } else if (fileName.includes('education')) {
+          markdown += this.renderEducationItem(item);
         } else {
           // Generic object handling
           markdown += this.renderGenericItem(item);
@@ -186,6 +188,27 @@ class ReadmeGenerator {
     }
 
     return markdown + '---\n\n';
+  }
+
+  // Render education items (new structure)
+  renderEducationItem(item) {
+    let markdown = `### ${this.formatText(item.degree)}, **${this.formatText(item.school)}**\n`;
+    if (item.duration) {
+      markdown += `*${item.duration}*\n`;
+    }
+    if (item.description) {
+      markdown += `\n${this.formatText(item.description)}\n`;
+    }
+    if (item.bullet_points && Array.isArray(item.bullet_points) && item.bullet_points.length > 0) {
+      item.bullet_points.forEach(point => {
+        markdown += `- ${this.formatText(point)}\n`;
+      });
+    }
+    if (item.skills) {
+      markdown += `\n**Skills:** ${this.formatText(item.skills)}\n`;
+    }
+    markdown += '\n---\n\n';
+    return markdown;
   }
 
   // Render generic object items

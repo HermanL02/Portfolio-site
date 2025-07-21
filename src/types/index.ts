@@ -44,9 +44,18 @@ export interface TechStackData {
   };
 }
 
+export interface EducationItem {
+  degree: string;
+  school: string;
+  duration: string;
+  description: string;
+  bullet_points: string[];
+  skills: string;
+}
+
 export interface EducationData {
   title: string;
-  items: string[];
+  items: EducationItem[];
 }
 
 export interface CurrentWorkData {
