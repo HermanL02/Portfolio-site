@@ -1,0 +1,82 @@
+name: 🤖 Sync Profile README
+
+on:
+  push:
+    branches: [main, master]
+    paths:
+      - 'config/**/*.yaml'
+      - 'config/**/*.yml' 
+      - 'generateReadme.js'
+      - 'deployToGithub.js'
+  workflow_dispatch: # Allow manual trigger
+    inputs:
+      force_update:
+        description: 'Force update even if no changes detected'
+        required: false
+        default: 'false'
+        type: boolean
+
+jobs:
+  sync-profile:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: 🔍 Checkout source repository
+      uses: actions/checkout@v4
+      with:
+        fetch-depth: 0
+
+    - name: 🟢 Setup Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+
+    - name: 📦 Install dependencies
+      run: npm ci
+
+    - name: 📝 Generate README from YAML
+      run: npm run generate-readme
+
+    - name: 🔍 Checkout profile repository
+      uses: actions/checkout@v4
+      with:
+        repository: ${{ vars.GITHUB_PROFILE_REPO || 'HermanL02/HermanL02' }}
+        token: ${{ secrets.PROFILE_SYNC_TOKEN }}
+        path: profile-repo
+
+    - name: 📋 Copy generated README to profile repo
+      run: |
+        cp README.md profile-repo/README.md
+        
+    - name: 🔍 Check for changes
+      id: changes
+      run: |
+        cd profile-repo
+        if git diff --quiet HEAD README.md; then
+          echo "has_changes=false" >> $GITHUB_OUTPUT
+        else
+          echo "has_changes=true" >> $GITHUB_OUTPUT
+        fi
+
+    - name: 🚀 Commit and push to profile repository
+      if: steps.changes.outputs.has_changes == 'true' || github.event.inputs.force_update == 'true'
+      run: |
+        cd profile-repo
+        git config user.name "${{ vars.GIT_USER_NAME || 'Website Bot' }}"
+        git config user.email "${{ vars.GIT_USER_EMAIL || 'noreply@github.com' }}"
+        
+        git add README.md
+        git commit -m "${{ vars.COMMIT_MESSAGE || '🤖 Auto-sync profile README from website' }} ($(date '+%Y-%m-%d %H:%M'))"
+        git push
+
+    - name: ✅ Success notification
+      if: steps.changes.outputs.has_changes == 'true' || github.event.inputs.force_update == 'true'
+      run: |
+        echo "✅ Profile README successfully synced!"
+        echo "🔗 View at: https://github.com/${{ vars.GITHUB_USERNAME || 'HermanL02' }}"
+
+    - name: ℹ️ No changes notification  
+      if: steps.changes.outputs.has_changes == 'false' && github.event.inputs.force_update != 'true'
+      run: |
+        echo "ℹ️ No changes detected - profile README is already up to date"

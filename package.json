@@ -6,7 +6,11 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "generate-readme": "node generateReadme.js",
+    "deploy-profile": "node deployToGithub.js",
+    "sync-github": "npm run generate-readme && npm run deploy-profile",
+    "test-sync": "node test-sync.js"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
@@ -14,6 +18,7 @@
     "@types/js-yaml": "^4.0.9",
     "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
+    "dotenv": "^17.2.0",
     "js-yaml": "^4.1.0",
     "lucide-react": "^0.525.0",
     "next": "15.4.2",
