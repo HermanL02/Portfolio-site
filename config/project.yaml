@@ -1,0 +1,18 @@
+title: "💼 Projects"
+items:
+  - name: "Live Suitely Hotel Order System"
+    description: "A hotel order system for Live Suitely"
+    bullet_points:
+      - "Built a Flutter-based hotel order system"
+    link: "https://github.com/hermanliang/ai-assisted-coding-tools"
+    deployment: "https://github.com/hermanliang/ai-assisted-coding-tools"
+    tag: "AI, Python, Flutter, Nest.js"
+  - name: "🧪 Reliable DevOps pipelines"
+    description: "Building reliable DevOps pipelines for secure delivery"
+    bullet_points:
+      - "Built a Docker-based DevOps pipeline for secure delivery"
+      - "Built a Kubernetes-based DevOps pipeline for secure delivery"
+      - "Built a GitLab CI/CD pipeline for secure delivery"
+    link: "https://github.com/hermanliang/reliable-devops-pipelines"
+    deployment: "https://github.com/hermanliang/reliable-devops-pipelines"
+    tag: "DevOps, Docker, Kubernetes, GitLab CI/CD"

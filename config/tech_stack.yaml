@@ -1,0 +1,8 @@
+title: "🧰 Tech Stack"
+categories:
+  Languages: "JavaScript, Python, Go, Dart, Java"
+  Frontend: "React, Flutter, Tailwind CSS"
+  Backend: "Node.js, Nest.js, GraphQL, REST"
+  DevOps: "Docker, Kubernetes, GitLab CI/CD, AWS, Azure"
+  Database: "MongoDB, MySQL"
+  Testing: "Jest, Postman" 

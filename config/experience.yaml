@@ -1,0 +1,15 @@
+title: "💼 Experience Highlights"
+items:
+  - company: "🪙 **Koii Network**"
+    description: "Optimized wallet performance, built P2P dApps, led CI/CD enhancements"
+    bullet_points:
+      - "Optimized wallet performance"
+      - "Built P2P dApps"
+      - "Led CI/CD enhancements"
+    tag: "Rust, Solana, Koii"
+  - company: "🏗️ **1 Way Technologies**"
+    description: "Fullstack development using Nest.js + Flutter"
+    tag: "Nest.js, Flutter, Tailwind CSS"
+  - company: "👷‍♂️ **ALM Construction**"
+    description: "Built WeChat HR mini-program for 300+ employees" 
+    tag: "WeChat, Flutter, Nest.js"
