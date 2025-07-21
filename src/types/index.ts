@@ -29,6 +29,7 @@ export interface ExperienceItem {
   description: string;
   bullet_points?: string[];
   tag: string;
+  duration: string;
 }
 
 export interface ExperienceData {
