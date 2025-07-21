@@ -22,6 +22,9 @@ export function ExperienceSection({ data }: ExperienceSectionProps) {
                 <MarkdownRenderer content={experience.company} inline />
               </CardTitle>
               <CardDescription>{experience.description}</CardDescription>
+              <div className="text-sm text-muted-foreground mt-2">
+                📅 {experience.duration}
+              </div>
             </CardHeader>
             <CardContent>
               {experience.bullet_points && (
