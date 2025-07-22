@@ -191,8 +191,11 @@ class ReadmeGenerator {
 
   // Render experience items
   renderExperienceItem(experience) {
-    let markdown = `### ${this.formatText(experience.company)}\n\n`;
-    
+    let markdown = `### ${this.formatText(experience.company)}\n`;
+    if (experience.duration) {
+      markdown += `*${this.formatText(experience.duration)}*\n`;
+    }
+    markdown += '\n';
     if (experience.description) {
       markdown += `${this.formatText(experience.description)}\n\n`;
     }
