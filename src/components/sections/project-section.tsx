@@ -70,9 +70,9 @@ export function ProjectSection({ data }: ProjectSectionProps) {
         {filteredProjects.map((project, index) => (
           <Card key={index} className="h-full">
             <CardHeader>
-              <CardTitle className="flex items-center justify-between">
+              <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
                 <span>{project.name}</span>
-                <div className="flex gap-2">
+                <div className="flex flex-wrap gap-2">
                   {project.tag.split(', ').map((tag, tagIndex) => (
                     <Badge key={tagIndex} variant="secondary">
                       {tag.trim()}

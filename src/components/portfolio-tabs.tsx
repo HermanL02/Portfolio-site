@@ -32,17 +32,19 @@ export function PortfolioTabs({ data }: PortfolioTabsProps) {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <TabsList className="grid w-full grid-cols-4 lg:grid-cols-8 mb-8">
-        {tabs.map((tab) => (
-          <TabsTrigger 
-            key={tab.id} 
-            value={tab.id}
-            className="text-xs lg:text-sm px-2"
-          >
-            {tab.label}
-          </TabsTrigger>
-        ))}
-      </TabsList>
+      <div className="w-full overflow-x-auto mb-8">
+        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1 min-w-fit">
+          {tabs.map((tab) => (
+            <TabsTrigger 
+              key={tab.id} 
+              value={tab.id}
+              className="text-xs lg:text-sm px-1 sm:px-2 whitespace-nowrap"
+            >
+              {tab.label}
+            </TabsTrigger>
+          ))}
+        </TabsList>
+      </div>
       
       {tabs.map((tab) => (
         <TabsContent key={tab.id} value={tab.id} className="mt-8">
