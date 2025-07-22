@@ -10,7 +10,7 @@
     "generate-readme": "node generateReadme.js",
     "deploy-profile": "node deployToGithub.js",
     "sync-github": "npm run generate-readme && npm run deploy-profile",
-    "test-sync": "node test-sync.js"
+    "sync-repos": "node scripts/getRepositoryInfo.js"
   },
   "dependencies": {
     "@radix-ui/react-slot": "^1.2.3",
