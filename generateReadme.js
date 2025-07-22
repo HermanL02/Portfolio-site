@@ -11,10 +11,32 @@ class ReadmeGenerator {
 
   // Dynamically discover and load all YAML files
   loadAllYamlFiles() {
-    const yamlFiles = fs.readdirSync(this.configDir)
-      .filter(file => file.endsWith('.yaml') || file.endsWith('.yml'))
-      .filter(file => file !== 'base.yaml') // Exclude base.yaml as it's just ordering
-      .sort();
+    // Read base.yaml for custom ordering if it exists
+    let yamlFiles;
+    const basePath = path.join(this.configDir, 'base.yaml');
+    if (fs.existsSync(basePath)) {
+      const baseOrder = yaml.load(fs.readFileSync(basePath, 'utf8'));
+      yamlFiles = baseOrder.filter(file => file !== 'base.yaml' && (file.endsWith('.yaml') || file.endsWith('.yml')));
+      // Fallback: add any other YAML files not in base.yaml
+      const allYaml = fs.readdirSync(this.configDir)
+        .filter(file => (file.endsWith('.yaml') || file.endsWith('.yml')) && file !== 'base.yaml');
+      for (const file of allYaml) {
+        if (!yamlFiles.includes(file)) yamlFiles.push(file);
+      }
+    } else {
+      yamlFiles = fs.readdirSync(this.configDir)
+        .filter(file => file.endsWith('.yaml') || file.endsWith('.yml'))
+        .filter(file => file !== 'base.yaml')
+        .sort();
+    }
+
+    // Force tech_stack.yaml before project.yaml if both exist
+    const techIdx = yamlFiles.indexOf('tech_stack.yaml');
+    const projIdx = yamlFiles.indexOf('project.yaml');
+    if (techIdx !== -1 && projIdx !== -1 && techIdx > projIdx) {
+      // Swap them
+      [yamlFiles[techIdx], yamlFiles[projIdx]] = [yamlFiles[projIdx], yamlFiles[techIdx]];
+    }
 
     console.log(`📁 Found ${yamlFiles.length} YAML files:`, yamlFiles);
 
