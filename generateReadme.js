@@ -310,15 +310,15 @@ class ReadmeGenerator {
       if (introSection.data.subtitle) {
         readmeContent += `\n*${this.formatText(introSection.data.subtitle)}*\n`;
       }
-      
+
       if (introSection.data.quote) {
         readmeContent += `\n> "${this.formatText(introSection.data.quote)}"\n`;
         if (introSection.data.quote_author) {
           readmeContent += `> — ${this.formatText(introSection.data.quote_author)}\n`;
         }
       }
-      
-      if (introSection.data.contact || introSection.data.website) {
+
+      if (introSection.data.contact || introSection.data.website || introSection.data.address) {
         readmeContent += '\n### Contact\n';
         if (introSection.data.website) {
           readmeContent += `- **Website**: [${introSection.data.website}](${introSection.data.website})\n`;
@@ -328,6 +328,9 @@ class ReadmeGenerator {
         }
         if (introSection.data.contact?.linkedin) {
           readmeContent += `- **LinkedIn**: [Profile](${introSection.data.contact.linkedin})\n`;
+        }
+        if (introSection.data.address) {
+          readmeContent += `- **Address**: ${introSection.data.address}\n`;
         }
       }
       readmeContent += '\n';

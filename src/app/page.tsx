@@ -1,27 +1,23 @@
 import { loadAllData } from '@/lib/data-loader';
 import { PortfolioTabs } from '@/components/portfolio-tabs';
+import { Sidebar } from '@/components/sidebar';
 
 export default async function Home() {
   const data = await loadAllData();
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-slate-50 to-slate-100">
-      <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
-        <header className="text-center mb-8 sm:mb-12">
-          <h1 className="text-3xl sm:text-4xl md:text-6xl font-bold mb-4 text-black">
-            {data.intro.title}
-          </h1>
-          <p className="text-lg sm:text-xl md:text-2xl text-gray-600 mb-4 sm:mb-6">
-            {data.intro.subtitle}
-          </p>
-          <blockquote className="text-base sm:text-lg italic text-gray-700 max-w-2xl mx-auto px-4 sm:px-0">
-            &ldquo;{data.intro.quote}&rdquo;
-            <footer className="text-sm mt-2">— {data.intro.quote_author}</footer>
-          </blockquote>
-        </header>
+    <div className="min-h-screen flex flex-col lg:flex-row">
+      {/* Left Sidebar - Fixed on desktop, collapsible on mobile */}
+      <aside className="lg:w-[400px] lg:fixed lg:left-0 lg:top-0 lg:h-screen lg:overflow-y-auto">
+        <Sidebar data={data.intro} />
+      </aside>
 
-        <PortfolioTabs data={data} />
-      </div>
+      {/* Main Content Area */}
+      <main className="flex-1 lg:ml-[400px] bg-gradient-to-br from-slate-50 to-slate-100 min-h-screen">
+        <div className="container mx-auto px-4 sm:px-6 lg:px-8 py-6 sm:py-8">
+          <PortfolioTabs data={data} />
+        </div>
+      </main>
     </div>
   );
 }

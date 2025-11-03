@@ -2,6 +2,7 @@ export interface IntroData {
   title: string;
   subtitle: string;
   website: string;
+  address?: string;
   contact: {
     email: string;
     linkedin: string;
