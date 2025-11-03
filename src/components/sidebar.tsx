@@ -9,7 +9,7 @@ interface SidebarProps {
 
 export function Sidebar({ data }: SidebarProps) {
   return (
-    <div className="h-full bg-gradient-to-br from-slate-900 to-slate-800 text-white p-8 flex flex-col">
+    <div className="h-full bg-gradient-to-br from-slate-800 to-slate-700 text-white p-8 flex flex-col">
       <div className="flex-1 flex flex-col justify-center space-y-8">
         {/* Profile Section */}
         <div className="space-y-4">

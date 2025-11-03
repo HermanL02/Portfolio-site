@@ -32,23 +32,27 @@ export function PortfolioTabs({ data }: PortfolioTabsProps) {
 
   return (
     <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <div className="w-full overflow-x-auto mb-8">
-        <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-1 min-w-fit">
-          {tabs.map((tab) => (
-            <TabsTrigger 
-              key={tab.id} 
-              value={tab.id}
-              className="text-xs lg:text-sm px-1 sm:px-2 whitespace-nowrap"
-            >
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+      <div className="w-full mb-10">
+        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-300 p-2">
+          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 bg-transparent">
+            {tabs.map((tab) => (
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className="text-xs lg:text-sm px-3 py-2.5 whitespace-nowrap rounded-xl data-[state=active]:bg-slate-700 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:bg-slate-200 transition-all duration-200 font-medium"
+              >
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        </div>
       </div>
-      
+
       {tabs.map((tab) => (
-        <TabsContent key={tab.id} value={tab.id} className="mt-8">
-          {tab.component}
+        <TabsContent key={tab.id} value={tab.id} className="mt-0 animate-in fade-in-50 duration-300">
+          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-300 p-8">
+            {tab.component}
+          </div>
         </TabsContent>
       ))}
     </Tabs>
