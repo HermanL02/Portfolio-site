@@ -36,7 +36,7 @@ export async function POST(request: NextRequest) {
     // Fix malformed JSON from iOS Shortcut
     // 1. Replace literal newlines inside string values with space
     // 2. Remove trailing commas before closing braces/brackets
-    let cleanedBody = rawBody
+    const cleanedBody = rawBody
       .replace(/(":\s*"[^"]*)\n([^"]*")/g, '$1 $2') // Replace newlines inside quoted strings
       .replace(/,(\s*[}\]])/g, '$1'); // Remove trailing commas
 
