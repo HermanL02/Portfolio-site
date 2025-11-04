@@ -33,10 +33,19 @@ export async function POST(request: NextRequest) {
     console.log('Raw body:', rawBody);
     console.log('Body length:', rawBody.length);
 
+    // Fix malformed JSON from iOS Shortcut
+    // 1. Replace literal newlines inside string values with space
+    // 2. Remove trailing commas before closing braces/brackets
+    let cleanedBody = rawBody
+      .replace(/(":\s*"[^"]*)\n([^"]*")/g, '$1 $2') // Replace newlines inside quoted strings
+      .replace(/,(\s*[}\]])/g, '$1'); // Remove trailing commas
+
+    console.log('Cleaned body:', cleanedBody);
+
     // Try to parse as JSON
     let locationData;
     try {
-      locationData = JSON.parse(rawBody);
+      locationData = JSON.parse(cleanedBody);
       console.log('Parsed JSON successfully:', locationData);
     } catch (parseError) {
       console.error('JSON parse error:', parseError);
