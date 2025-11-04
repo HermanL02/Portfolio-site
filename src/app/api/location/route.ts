@@ -1,4 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
+import clientPromise from '@/lib/mongodb';
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -56,6 +57,26 @@ export async function POST(request: NextRequest) {
       console.error('JSON parse error:', parseError);
       console.log('Body bytes:', Array.from(rawBody).map(c => c.charCodeAt(0)));
       throw parseError;
+    }
+
+    // Save to MongoDB
+    try {
+      const client = await clientPromise;
+      const db = client.db('location_tracker');
+      const collection = db.collection('locations');
+
+      const document = {
+        ...locationData,
+        timestamp: new Date(),
+        userAgent: request.headers.get('user-agent'),
+        ipAddress: request.headers.get('x-real-ip') || request.headers.get('x-forwarded-for'),
+      };
+
+      const result = await collection.insertOne(document);
+      console.log('Saved to MongoDB:', result.insertedId);
+    } catch (dbError) {
+      console.error('MongoDB error:', dbError);
+      // Continue even if DB save fails
     }
 
     return NextResponse.json(
