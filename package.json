@@ -10,7 +10,8 @@
     "generate-readme": "node generateReadme.js",
     "deploy-profile": "node deployToGithub.js",
     "sync-github": "npm run generate-readme && npm run deploy-profile",
-    "sync-repos": "node scripts/getRepositoryInfo.js"
+    "sync-repos": "node scripts/getRepositoryInfo.js",
+    "setup-indexes": "tsx scripts/setup-indexes.ts"
   },
   "dependencies": {
     "@radix-ui/react-scroll-area": "^1.2.10",
@@ -38,6 +39,7 @@
     "eslint": "^9",
     "eslint-config-next": "15.4.2",
     "tailwindcss": "^4",
+    "tsx": "^4.20.6",
     "tw-animate-css": "^1.3.5",
     "typescript": "^5"
   }
