@@ -1,6 +1,7 @@
 import { loadAllData } from '@/lib/data-loader';
 import { PortfolioTabs } from '@/components/portfolio-tabs';
 import { Sidebar } from '@/components/sidebar';
+import { ChatbotModal } from '@/components/ChatbotModal';
 
 export default async function Home() {
   const data = await loadAllData();
@@ -33,6 +34,9 @@ export default async function Home() {
           <PortfolioTabs data={data} />
         </div>
       </main>
+
+      {/* Chatbot Modal */}
+      <ChatbotModal />
     </div>
   );
 }
