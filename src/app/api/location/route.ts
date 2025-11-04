@@ -1,5 +1,15 @@
 import { NextRequest, NextResponse } from 'next/server';
 
+export async function GET() {
+  return NextResponse.json(
+    {
+      success: true,
+      message: 'Location API is running'
+    },
+    { status: 200 }
+  );
+}
+
 export async function POST(request: NextRequest) {
   try {
     // Parse JSON body
