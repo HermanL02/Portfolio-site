@@ -34,11 +34,16 @@ export async function POST(request: NextRequest) {
     console.log('Body length:', rawBody.length);
 
     // Fix malformed JSON from iOS Shortcut
-    // 1. Replace literal newlines inside string values with space
+    // 1. Replace ALL literal newlines/control characters with spaces
     // 2. Remove trailing commas before closing braces/brackets
     const cleanedBody = rawBody
-      .replace(/(":\s*"[^"]*)\n([^"]*")/g, '$1 $2') // Replace newlines inside quoted strings
-      .replace(/,(\s*[}\]])/g, '$1'); // Remove trailing commas
+      .replace(/\r?\n/g, ' ') // Replace all newlines with spaces
+      .replace(/\s+/g, ' ') // Collapse multiple spaces
+      .replace(/,(\s*[}\]])/g, '$1') // Remove trailing commas
+      .replace(/"\s*:\s*"/g, '":"') // Clean up spacing around colons
+      .replace(/"\s*,\s*"/g, '","') // Clean up spacing around commas
+      .replace(/{\s+/g, '{') // Remove space after opening brace
+      .replace(/\s+}/g, '}'); // Remove space before closing brace
 
     console.log('Cleaned body:', cleanedBody);
 
