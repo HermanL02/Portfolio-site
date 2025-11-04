@@ -22,25 +22,46 @@ export async function GET() {
 
 export async function POST(request: NextRequest) {
   try {
-    // Parse JSON body
-    const locationData = await request.json();
+    // Log request details
+    console.log('=== Incoming Location Request ===');
+    console.log('Method:', request.method);
+    console.log('URL:', request.url);
+    console.log('Headers:', Object.fromEntries(request.headers.entries()));
 
-    // Log the received location data
-    console.log('Received location data:', locationData);
+    // Get raw body text first for debugging
+    const rawBody = await request.text();
+    console.log('Raw body:', rawBody);
+    console.log('Body length:', rawBody.length);
+
+    // Try to parse as JSON
+    let locationData;
+    try {
+      locationData = JSON.parse(rawBody);
+      console.log('Parsed JSON successfully:', locationData);
+    } catch (parseError) {
+      console.error('JSON parse error:', parseError);
+      console.log('Body bytes:', Array.from(rawBody).map(c => c.charCodeAt(0)));
+      throw parseError;
+    }
 
     return NextResponse.json(
       {
         success: true,
-        message: 'Location data received successfully'
+        message: 'Location data received successfully',
+        receivedData: locationData
       },
       { status: 200, headers: corsHeaders }
     );
   } catch (error) {
-    console.error('Error processing location data:', error);
+    console.error('=== Error in Location Endpoint ===');
+    console.error('Error:', error);
+    console.error('Error stack:', error instanceof Error ? error.stack : 'No stack trace');
+
     return NextResponse.json(
       {
         success: true,
-        message: 'Request received'
+        message: 'Request received but could not parse',
+        error: error instanceof Error ? error.message : 'Unknown error'
       },
       { status: 200, headers: corsHeaders }
     );
