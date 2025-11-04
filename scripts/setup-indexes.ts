@@ -15,7 +15,7 @@ if (!MONGODB_URI) {
 async function setupIndexes() {
   console.log('🔧 Setting up MongoDB indexes...\n');
 
-  const client = new MongoClient(MONGODB_URI);
+  const client = new MongoClient(MONGODB_URI!);
 
   try {
     // Connect to MongoDB
