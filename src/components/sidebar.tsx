@@ -2,6 +2,7 @@ import { IntroData } from '@/types';
 import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Mail, Linkedin, Globe, MapPin } from 'lucide-react';
+import { LocationTracker } from '@/components/LocationTracker';
 
 interface SidebarProps {
   data: IntroData;
@@ -41,6 +42,11 @@ export function Sidebar({ data }: SidebarProps) {
             &mdash; {data.quote_author}
           </footer>
         </Card>
+
+        {/* Location Tracker */}
+        <div>
+          <LocationTracker />
+        </div>
 
         {/* Contact Links */}
         <div className="space-y-3">

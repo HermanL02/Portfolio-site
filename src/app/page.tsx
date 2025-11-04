@@ -2,6 +2,7 @@ import { loadAllData } from '@/lib/data-loader';
 import { PortfolioTabs } from '@/components/portfolio-tabs';
 import { Sidebar } from '@/components/sidebar';
 import { ChatbotModal } from '@/components/ChatbotModal';
+import { CalendlyButton } from '@/components/CalendlyButton';
 
 export default async function Home() {
   const data = await loadAllData();
@@ -25,9 +26,10 @@ export default async function Home() {
             <h1 className="text-4xl sm:text-5xl font-bold text-slate-800 mb-3">
               Portfolio
             </h1>
-            <p className="text-lg text-slate-700 max-w-2xl">
+            <p className="text-lg text-slate-700 max-w-2xl mb-4">
               Explore my projects, experience, and technical expertise
             </p>
+            <CalendlyButton />
           </div>
 
           {/* Tabs Content */}

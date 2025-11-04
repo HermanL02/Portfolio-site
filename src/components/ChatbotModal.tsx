@@ -85,7 +85,7 @@ export function ChatbotModal() {
       <Button
         onClick={() => setIsOpen(true)}
         size="icon"
-        className="fixed bottom-6 right-6 h-14 w-14 rounded-full shadow-lg hover:scale-110 transition-all duration-300 z-50"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-14 w-14 rounded-full shadow-lg hover:scale-110 transition-all duration-300 z-50"
         aria-label="Open chat"
       >
         <MessageCircle size={24} />
@@ -94,8 +94,8 @@ export function ChatbotModal() {
   }
 
   return (
-    <Card className="fixed bottom-6 right-6 w-96 h-[600px] flex flex-col z-50 shadow-2xl">
-      <CardHeader className="space-y-0 pb-3">
+    <Card className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] max-w-96 h-[calc(100vh-2rem)] max-h-[600px] md:bottom-6 md:right-6 flex flex-col z-50 shadow-2xl overflow-hidden">
+      <CardHeader className="shrink-0 space-y-0 pb-3">
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <MessageCircle className="h-5 w-5" />
@@ -116,9 +116,9 @@ export function ChatbotModal() {
         </div>
       </CardHeader>
 
-      <CardContent className="flex-1 p-0 flex flex-col">
-        <ScrollArea className="flex-1 px-4">
-          <div className="space-y-4 py-4">
+      <CardContent className="flex-1 p-0 flex flex-col min-h-0">
+        <ScrollArea className="flex-1 h-full">
+          <div className="space-y-4 p-4">
             {messages.map((message, index) => (
               <div
                 key={index}
@@ -156,7 +156,7 @@ export function ChatbotModal() {
           </div>
         </ScrollArea>
 
-        <div className="border-t p-4">
+        <div className="shrink-0 border-t p-4">
           <div className="flex gap-2">
             <Input
               type="text"
