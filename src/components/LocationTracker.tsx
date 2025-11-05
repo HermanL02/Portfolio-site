@@ -333,8 +333,8 @@ export function LocationTracker() {
         </Button>
       </div>
 
-      {/* Emergency Alarm Button */}
-      <Button
+      {/* Emergency Alarm Button - Disabled */}
+      {/* <Button
         onClick={(e) => {
           e.preventDefault();
           triggerAlarm();
@@ -345,7 +345,7 @@ export function LocationTracker() {
       >
         <AlertTriangle className="h-4 w-4 mr-2" />
         {isAlarmTriggering ? 'Triggering...' : 'Emergency Alarm'}
-      </Button>
+      </Button> */}
     </div>
   );
 }

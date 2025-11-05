@@ -28,7 +28,7 @@ export function CalendlyButton() {
       className="bg-slate-700 text-white hover:bg-slate-800 rounded-full shadow-md hover:shadow-lg animate-pulse"
     >
       <Calendar className="h-4 w-4" />
-      Schedule Coffee Chat with me
+      Schedule Coffee Chat with me by Calendly
     </Button>
   );
 }

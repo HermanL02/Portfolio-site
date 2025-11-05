@@ -1,5 +1,4 @@
 import { IntroData } from '@/types';
-import { Card } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Mail, Linkedin, Globe, MapPin } from 'lucide-react';
 import { LocationTracker } from '@/components/LocationTracker';
@@ -34,14 +33,11 @@ export function Sidebar({ data }: SidebarProps) {
         </div>
 
         {/* Quote Section */}
-        <Card className="bg-slate-800/50 border-slate-700 p-6">
+        <div className="border-l-4 border-slate-600 pl-4 py-2">
           <blockquote className="text-sm italic text-slate-300">
             &ldquo;{data.quote}&rdquo;
           </blockquote>
-          <footer className="text-xs text-slate-400 mt-2">
-            &mdash; {data.quote_author}
-          </footer>
-        </Card>
+        </div>
 
         {/* Location Tracker */}
         <div>
