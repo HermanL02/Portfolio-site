@@ -305,6 +305,9 @@ class ReadmeGenerator {
     // Generate README content with intro data
     let readmeContent = `# ${introSection?.data?.title || 'Personal Portfolio'}\n`;
     
+    // Add WakaTime badge
+    readmeContent += `\n[![wakatime](https://wakatime.com/badge/user/de28d07d-216c-456d-89aa-5f4a5954eda3.svg)](https://wakatime.com/@de28d07d-216c-456d-89aa-5f4a5954eda3)\n`;
+    
     // Add intro content (subtitle, quote, contact)
     if (introSection) {
       if (introSection.data.subtitle) {
