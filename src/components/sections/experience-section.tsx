@@ -1,5 +1,3 @@
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
 import { MarkdownRenderer } from '@/components/ui/markdown-renderer';
 import { ExperienceData } from '@/types';
 
@@ -9,44 +7,51 @@ interface ExperienceSectionProps {
 
 export function ExperienceSection({ data }: ExperienceSectionProps) {
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold mb-6">{data.title}</h2>
+    <div className="space-y-8">
+      <div>
+        <h2 className="text-xl font-bold text-terminal-green mb-1">{data.title}</h2>
+        <p className="text-xs text-muted-foreground">{data.items.length} positions</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <div className="space-y-4">
         {data.items.map((experience, index) => (
-          <Card key={index} className="h-full">
-            <CardHeader>
-              <CardTitle className="text-lg">
-                <MarkdownRenderer content={experience.company} inline />
-              </CardTitle>
-              <CardDescription>{experience.description}</CardDescription>
-              <div className="text-sm text-muted-foreground mt-2">
-                📅 {experience.duration}
+          <div
+            key={index}
+            className="border border-terminal-border p-5 hover:border-terminal-green-dim transition-colors terminal-line hover-lift"
+            style={{ animationDelay: `${index * 100}ms` }}
+          >
+            <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
+              <div>
+                <h3 className="text-sm font-bold text-foreground">
+                  <MarkdownRenderer content={experience.company} inline />
+                </h3>
+                <p className="text-xs text-muted-foreground mt-0.5">{experience.description}</p>
               </div>
-            </CardHeader>
-            <CardContent>
-              {experience.bullet_points && (
-                <ul className="space-y-2 mb-4">
-                  {experience.bullet_points.map((point, pointIndex) => (
-                    <li key={pointIndex} className="flex items-start">
-                      <span className="text-blue-500 mr-2">•</span>
-                      <MarkdownRenderer content={point} inline className="text-sm" />
-                    </li>
-                  ))}
-                </ul>
-              )}
-              
-              <div className="flex flex-wrap gap-2">
-                {experience.tag.split(', ').map((tag, tagIndex) => (
-                  <Badge key={tagIndex} variant="outline" className="text-xs">
-                    {tag.trim()}
-                  </Badge>
+              <span className="text-xs text-terminal-amber shrink-0">{experience.duration}</span>
+            </div>
+
+            {experience.bullet_points && (
+              <ul className="space-y-1.5 mb-4">
+                {experience.bullet_points.map((point, pointIndex) => (
+                  <li key={pointIndex} className="flex items-start text-xs">
+                    <span className="text-terminal-green mr-2 shrink-0">&gt;</span>
+                    <MarkdownRenderer content={point} inline className="text-muted-foreground" />
+                  </li>
                 ))}
-              </div>
-            </CardContent>
-          </Card>
+              </ul>
+            )}
+
+            <div className="flex flex-wrap gap-1.5">
+              {experience.tag.split(', ').map((tag, tagIndex) => (
+                <span
+                  key={tagIndex}
+                  className="text-[10px] px-1.5 py-0.5 border border-terminal-border text-terminal-green-dim"
+                >
+                  {tag.trim()}
+                </span>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     </div>

@@ -1,11 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
-import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { MarkdownRenderer } from '@/components/ui/markdown-renderer';
 import { ProjectData } from '@/types';
+import { ExternalLink, Github } from 'lucide-react';
 
 interface ProjectSectionProps {
   data: ProjectData;
@@ -22,17 +20,17 @@ export function ProjectSection({ data }: ProjectSectionProps) {
     )
   );
 
-  const filteredProjects = selectedTags.length === 0 
-    ? data.items 
-    : data.items.filter(project => 
-        selectedTags.some(tag => 
+  const filteredProjects = selectedTags.length === 0
+    ? data.items
+    : data.items.filter(project =>
+        selectedTags.some(tag =>
           project.tag.toLowerCase().includes(tag.toLowerCase())
         )
       );
 
   const toggleTag = (tag: string) => {
-    setSelectedTags(prev => 
-      prev.includes(tag) 
+    setSelectedTags(prev =>
+      prev.includes(tag)
         ? prev.filter(t => t !== tag)
         : [...prev, tag]
     );
@@ -41,75 +39,104 @@ export function ProjectSection({ data }: ProjectSectionProps) {
   const clearFilters = () => setSelectedTags([]);
 
   return (
-    <div className="space-y-6">
-      <div className="text-center">
-        <h2 className="text-3xl font-bold mb-4">{data.title}</h2>
-        
-        <div className="flex flex-wrap gap-2 justify-center mb-6">
-          <Button 
-            variant={selectedTags.length === 0 ? "default" : "outline"}
-            size="sm"
-            onClick={clearFilters}
-          >
-            All Projects
-          </Button>
-          {allTags.map(tag => (
-            <Button
-              key={tag}
-              variant={selectedTags.includes(tag) ? "default" : "outline"}
-              size="sm"
-              onClick={() => toggleTag(tag)}
-            >
-              {tag}
-            </Button>
-          ))}
-        </div>
+    <div className="space-y-8">
+      {/* Section header */}
+      <div>
+        <h2 className="text-xl font-bold text-terminal-green mb-1">{data.title}</h2>
+        <p className="text-xs text-muted-foreground">{filteredProjects.length} entries found</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+      {/* Filter tags */}
+      <div className="flex flex-wrap gap-2">
+        <button
+          onClick={clearFilters}
+          className={`text-xs px-2 py-1 border transition-colors ${
+            selectedTags.length === 0
+              ? 'border-terminal-green text-terminal-green bg-terminal-surface'
+              : 'border-terminal-border text-muted-foreground hover:text-terminal-green hover:border-terminal-green'
+          }`}
+        >
+          --all
+        </button>
+        {allTags.map(tag => (
+          <button
+            key={tag}
+            onClick={() => toggleTag(tag)}
+            className={`text-xs px-2 py-1 border transition-colors ${
+              selectedTags.includes(tag)
+                ? 'border-terminal-green text-terminal-green bg-terminal-surface'
+                : 'border-terminal-border text-muted-foreground hover:text-terminal-green hover:border-terminal-green'
+            }`}
+          >
+            --{tag.toLowerCase().replace(/\s+/g, '-')}
+          </button>
+        ))}
+      </div>
+
+      {/* Project grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredProjects.map((project, index) => (
-          <Card key={index} className="h-full">
-            <CardHeader>
-              <CardTitle className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-2">
-                <span>{project.name}</span>
-                <div className="flex flex-wrap gap-2">
-                  {project.tag.split(', ').map((tag, tagIndex) => (
-                    <Badge key={tagIndex} variant="secondary">
-                      {tag.trim()}
-                    </Badge>
-                  ))}
-                </div>
-              </CardTitle>
-              <CardDescription>{project.description}</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <ul className="space-y-2 mb-4">
-                {project.bullet_points.map((point, pointIndex) => (
-                  <li key={pointIndex} className="flex items-start">
-                    <span className="text-blue-500 mr-2">•</span>
-                    <MarkdownRenderer content={point} inline />
-                  </li>
-                ))}
-              </ul>
-              
-              <div className="flex gap-2">
+          <div
+            key={index}
+            className="border border-terminal-border p-5 hover:border-terminal-green-dim transition-colors group terminal-line hover-lift"
+            style={{ animationDelay: `${index * 80}ms` }}
+          >
+            {/* Project header */}
+            <div className="flex items-start justify-between gap-3 mb-3">
+              <div className="flex-1 min-w-0">
+                <h3 className="text-sm font-bold text-foreground group-hover:text-terminal-green transition-colors">
+                  {project.name}
+                </h3>
+                <p className="text-xs text-muted-foreground mt-1">{project.description}</p>
+              </div>
+              <div className="flex gap-2 shrink-0">
                 {project.link && (
-                  <Button asChild size="sm">
-                    <a href={project.link} target="_blank" rel="noopener noreferrer">
-                      GitHub
-                    </a>
-                  </Button>
+                  <a
+                    href={project.link}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-terminal-green transition-colors"
+                    aria-label="GitHub"
+                  >
+                    <Github className="h-4 w-4" />
+                  </a>
                 )}
                 {project.deployment && project.deployment !== project.link && (
-                  <Button asChild variant="outline" size="sm">
-                    <a href={project.deployment} target="_blank" rel="noopener noreferrer">
-                      Live Demo
-                    </a>
-                  </Button>
+                  <a
+                    href={project.deployment}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="text-muted-foreground hover:text-terminal-amber transition-colors"
+                    aria-label="Live Demo"
+                  >
+                    <ExternalLink className="h-4 w-4" />
+                  </a>
                 )}
               </div>
-            </CardContent>
-          </Card>
+            </div>
+
+            {/* Bullet points */}
+            <ul className="space-y-1.5 mb-4">
+              {project.bullet_points.map((point, pointIndex) => (
+                <li key={pointIndex} className="flex items-start text-xs">
+                  <span className="text-terminal-green mr-2 shrink-0">&gt;</span>
+                  <MarkdownRenderer content={point} inline />
+                </li>
+              ))}
+            </ul>
+
+            {/* Tags */}
+            <div className="flex flex-wrap gap-1.5">
+              {project.tag.split(', ').map((tag, tagIndex) => (
+                <span
+                  key={tagIndex}
+                  className="text-[10px] px-1.5 py-0.5 border border-terminal-border text-terminal-green-dim"
+                >
+                  {tag.trim()}
+                </span>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
     </div>

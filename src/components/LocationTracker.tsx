@@ -1,9 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { Card } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { MapPin, Clock, Battery, BatteryLow, BatteryMedium, BatteryFull, AlertTriangle, History } from 'lucide-react';
+import { MapPin, Clock, Battery, BatteryLow, BatteryMedium, BatteryFull, History } from 'lucide-react';
 
 interface LocationData {
   _id: string;
@@ -32,7 +30,6 @@ interface LocationData {
 export function LocationTracker() {
   const [locationData, setLocationData] = useState<LocationData | null>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isAlarmTriggering, setIsAlarmTriggering] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [showHistory, setShowHistory] = useState(false);
   const [locationHistory, setLocationHistory] = useState<LocationData[]>([]);
@@ -40,7 +37,6 @@ export function LocationTracker() {
 
   useEffect(() => {
     fetchLocation();
-    // Refresh location every 60 seconds
     const interval = setInterval(fetchLocation, 60000);
     return () => clearInterval(interval);
   }, []);
@@ -51,7 +47,6 @@ export function LocationTracker() {
       const result = await response.json();
 
       if (result.success && result.data) {
-        // Fetch address using reverse geocoding
         const address = await fetchAddress(
           result.data.location_data.latitude,
           result.data.location_data.longitude
@@ -71,22 +66,12 @@ export function LocationTracker() {
 
   const fetchAddress = async (lat: number, lon: number): Promise<string> => {
     try {
-      // Add delay to avoid rate limiting
       await new Promise(resolve => setTimeout(resolve, 100));
-
       const response = await fetch(
         `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lon}&zoom=18&addressdetails=1`,
-        {
-          headers: {
-            'User-Agent': 'LocationTracker/1.0',
-          },
-        }
+        { headers: { 'User-Agent': 'LocationTracker/1.0' } }
       );
-
-      if (!response.ok) {
-        throw new Error(`HTTP ${response.status}`);
-      }
-
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
       const data = await response.json();
       return data.display_name || 'Address not available';
     } catch (err) {
@@ -102,11 +87,8 @@ export function LocationTracker() {
       const result = await response.json();
 
       if (result.success && result.data) {
-        // Filter out items with invalid location data and fetch addresses sequentially to avoid rate limiting
         const validItems = result.data.filter((item: LocationData) =>
-          item.location_data &&
-          item.location_data.latitude &&
-          item.location_data.longitude
+          item.location_data?.latitude && item.location_data?.longitude
         );
 
         const historyWithAddresses: LocationData[] = [];
@@ -117,7 +99,6 @@ export function LocationTracker() {
           );
           historyWithAddresses.push({ ...item, address });
         }
-
         setLocationHistory(historyWithAddresses);
       }
     } catch (err) {
@@ -129,40 +110,14 @@ export function LocationTracker() {
 
   const handleShowHistory = () => {
     setShowHistory(true);
-    if (locationHistory.length === 0) {
-      fetchHistory();
-    }
-  };
-
-  const triggerAlarm = async () => {
-    if (isAlarmTriggering) return;
-
-    setIsAlarmTriggering(true);
-    try {
-      const response = await fetch('/api/alarm', {
-        method: 'POST',
-      });
-
-      const result = await response.json();
-
-      if (result.success) {
-        alert('Emergency alarm triggered successfully!');
-      } else {
-        alert('Failed to trigger alarm: ' + result.message);
-      }
-    } catch (err) {
-      console.error('Error triggering alarm:', err);
-      alert('Failed to trigger alarm');
-    } finally {
-      setIsAlarmTriggering(false);
-    }
+    if (locationHistory.length === 0) fetchHistory();
   };
 
   const getBatteryIcon = (level: number) => {
-    if (level < 0.2) return <BatteryLow className="h-4 w-4 text-red-400" />;
-    if (level < 0.5) return <BatteryMedium className="h-4 w-4 text-yellow-400" />;
-    if (level < 0.9) return <BatteryFull className="h-4 w-4 text-green-400" />;
-    return <Battery className="h-4 w-4 text-green-400" />;
+    if (level < 0.2) return <BatteryLow className="h-3 w-3 text-destructive" />;
+    if (level < 0.5) return <BatteryMedium className="h-3 w-3 text-terminal-amber" />;
+    if (level < 0.9) return <BatteryFull className="h-3 w-3 text-terminal-green" />;
+    return <Battery className="h-3 w-3 text-terminal-green" />;
   };
 
   const getTimeAgo = (timestamp: string) => {
@@ -170,17 +125,15 @@ export function LocationTracker() {
     const then = new Date(timestamp).getTime();
     const diffInMinutes = Math.floor((now - then) / 60000);
 
-    if (diffInMinutes < 1) return 'Just now';
-    if (diffInMinutes === 1) return '1 min ago';
-    if (diffInMinutes < 60) return `${diffInMinutes} mins ago`;
-
+    if (diffInMinutes < 1) return 'just now';
+    if (diffInMinutes === 1) return '1m ago';
+    if (diffInMinutes < 60) return `${diffInMinutes}m ago`;
     const diffInHours = Math.floor(diffInMinutes / 60);
-    if (diffInHours === 1) return '1 hour ago';
-    if (diffInHours < 24) return `${diffInHours} hours ago`;
-
+    if (diffInHours === 1) return '1h ago';
+    if (diffInHours < 24) return `${diffInHours}h ago`;
     const diffInDays = Math.floor(diffInHours / 24);
-    if (diffInDays === 1) return '1 day ago';
-    return `${diffInDays} days ago`;
+    if (diffInDays === 1) return '1d ago';
+    return `${diffInDays}d ago`;
   };
 
   const openMapLink = () => {
@@ -194,47 +147,45 @@ export function LocationTracker() {
 
   if (isLoading) {
     return (
-      <Card className="bg-slate-800/50 border-slate-700 p-4">
-        <div className="text-sm text-slate-400">Loading location...</div>
-      </Card>
+      <div className="border border-terminal-border p-3">
+        <span className="text-xs text-muted-foreground">fetching location<span className="cursor-blink">_</span></span>
+      </div>
     );
   }
 
   if (error || !locationData) {
     return (
-      <Card className="bg-slate-800/50 border-slate-700 p-4">
-        <div className="text-sm text-slate-400">{error || 'No location data'}</div>
-      </Card>
+      <div className="border border-terminal-border p-3">
+        <span className="text-xs text-muted-foreground">{error || 'No location data'}</span>
+      </div>
     );
   }
 
   if (showHistory) {
     return (
-      <div className="space-y-3">
-        <Card className="bg-slate-800/50 border-slate-700 p-4">
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="text-sm font-semibold text-white flex items-center gap-2">
-              <History className="h-4 w-4" />
-              Location History
-            </h3>
-            <Button
+      <div className="space-y-2">
+        <div className="border border-terminal-border p-3">
+          <div className="flex items-center justify-between mb-3">
+            <span className="text-xs font-bold text-terminal-amber flex items-center gap-1.5">
+              <History className="h-3 w-3" />
+              location/history
+            </span>
+            <button
               onClick={() => setShowHistory(false)}
-              variant="ghost"
-              size="sm"
-              className="text-slate-400 hover:text-white"
+              className="text-[10px] text-muted-foreground hover:text-terminal-green transition-colors"
             >
-              Back
-            </Button>
+              [back]
+            </button>
           </div>
 
           {isLoadingHistory ? (
-            <div className="text-sm text-slate-400">Loading history...</div>
+            <span className="text-xs text-muted-foreground">loading<span className="cursor-blink">_</span></span>
           ) : (
-            <div className="space-y-3 max-h-[500px] overflow-y-auto">
+            <div className="space-y-2 max-h-[400px] overflow-y-auto">
               {locationHistory.map((location) => (
-                <Card
+                <button
                   key={location._id}
-                  className="bg-slate-900/50 border-slate-700 p-3 cursor-pointer hover:bg-slate-900 transition-colors"
+                  className="w-full text-left border border-terminal-border p-2 hover:border-terminal-green-dim transition-colors"
                   onClick={() => {
                     const { latitude, longitude } = location.location_data;
                     window.open(
@@ -243,109 +194,83 @@ export function LocationTracker() {
                     );
                   }}
                 >
-                  <div className="space-y-2">
-                    <div className="flex items-start gap-2">
-                      <MapPin className="h-4 w-4 text-slate-400 mt-0.5 flex-shrink-0" />
-                      <div className="flex-1 min-w-0">
-                        <p className="text-xs text-slate-300 break-words">
-                          {location.address || 'Loading address...'}
-                        </p>
-                      </div>
-                    </div>
-
-                    <div className="flex items-center justify-between text-xs text-slate-500">
-                      <div className="flex items-center gap-2">
-                        <Clock className="h-3 w-3" />
-                        <span>{getTimeAgo(location.timestamp)}</span>
-                      </div>
-                      <div className="flex items-center gap-2">
-                        {getBatteryIcon(location.battery_level)}
-                        <span>{Math.round(location.battery_level * 100)}%</span>
-                      </div>
-                    </div>
+                  <div className="flex items-start gap-1.5">
+                    <MapPin className="h-3 w-3 text-terminal-green-dim mt-0.5 shrink-0" />
+                    <p className="text-[10px] text-muted-foreground break-words">
+                      {location.address || 'Loading...'}
+                    </p>
                   </div>
-                </Card>
+                  <div className="flex items-center justify-between mt-1.5 text-[10px] text-muted-foreground">
+                    <span className="flex items-center gap-1">
+                      <Clock className="h-2.5 w-2.5" />
+                      {getTimeAgo(location.timestamp)}
+                    </span>
+                    <span className="flex items-center gap-1">
+                      {getBatteryIcon(location.battery_level)}
+                      {Math.round(location.battery_level * 100)}%
+                    </span>
+                  </div>
+                </button>
               ))}
             </div>
           )}
-        </Card>
+        </div>
       </div>
     );
   }
 
   return (
-    <div className="space-y-3">
-      {/* Location Card */}
-      <Card className="bg-slate-800/50 border-slate-700 p-4 cursor-pointer hover:bg-slate-800 transition-colors" onClick={openMapLink}>
-        <div className="space-y-3">
-          {/* Map Preview - Using OSM tiles via iframe */}
-          <div className="aspect-video rounded-md overflow-hidden bg-slate-900 relative group">
-            <iframe
-              src={`https://www.openstreetmap.org/export/embed.html?bbox=${locationData.location_data.longitude - 0.005},${locationData.location_data.latitude - 0.004},${locationData.location_data.longitude + 0.005},${locationData.location_data.latitude + 0.004}&layer=mapnik&marker=${locationData.location_data.latitude},${locationData.location_data.longitude}`}
-              style={{ border: 0, width: '100%', height: '100%', pointerEvents: 'none' }}
-              title="Location Map"
-            />
-            <div className="absolute inset-0 bg-black opacity-0 group-hover:opacity-20 transition-opacity pointer-events-none" />
-            <div className="absolute bottom-2 right-2 bg-slate-900/80 px-2 py-1 rounded text-xs text-slate-300 group-hover:bg-blue-900/80 transition-colors pointer-events-none">
-              Click to open in maps
-            </div>
+    <div className="space-y-2">
+      {/* Location display */}
+      <button
+        onClick={openMapLink}
+        className="w-full text-left border border-terminal-border p-3 hover:border-terminal-green-dim transition-colors"
+      >
+        {/* Map Preview */}
+        <div className="aspect-video mb-3 overflow-hidden bg-[#0a0a0a] relative">
+          <iframe
+            src={`https://www.openstreetmap.org/export/embed.html?bbox=${locationData.location_data.longitude - 0.005},${locationData.location_data.latitude - 0.004},${locationData.location_data.longitude + 0.005},${locationData.location_data.latitude + 0.004}&layer=mapnik&marker=${locationData.location_data.latitude},${locationData.location_data.longitude}`}
+            style={{ border: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'hue-rotate(90deg) saturate(0.3) brightness(0.7)' }}
+            title="Location Map"
+          />
+        </div>
+
+        <div className="space-y-1.5">
+          <div className="flex items-center gap-1.5 text-xs text-terminal-green-dim">
+            <MapPin className="h-3 w-3" />
+            <span>{locationData.name}</span>
           </div>
 
-          {/* Location Info */}
-          <div className="space-y-2">
-            <div className="flex items-center gap-2 text-sm text-slate-300">
-              <MapPin className="h-4 w-4" />
-              <span className="font-medium">{locationData.name}</span>
-            </div>
+          {locationData.address && (
+            <p className="text-[10px] text-muted-foreground pl-[18px] break-words">
+              {locationData.address}
+            </p>
+          )}
 
-            {/* Street Address */}
-            {locationData.address && (
-              <div className="text-xs text-slate-400 pl-6 break-words">
-                {locationData.address}
-              </div>
-            )}
-
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <Clock className="h-3 w-3" />
-              <span>Updated {getTimeAgo(locationData.timestamp)}</span>
-            </div>
-
-            <div className="flex items-center gap-2 text-xs text-slate-400">
+          <div className="flex items-center gap-3 pl-[18px] text-[10px] text-muted-foreground">
+            <span className="flex items-center gap-1">
+              <Clock className="h-2.5 w-2.5" />
+              {getTimeAgo(locationData.timestamp)}
+            </span>
+            <span className="flex items-center gap-1">
               {getBatteryIcon(locationData.battery_level)}
-              <span>{Math.round(locationData.battery_level * 100)}%</span>
-            </div>
+              {Math.round(locationData.battery_level * 100)}%
+            </span>
           </div>
         </div>
-      </Card>
+      </button>
 
-      {/* Action Buttons */}
-      <div className="flex gap-2">
-        <Button
-          onClick={(e) => {
-            e.preventDefault();
-            handleShowHistory();
-          }}
-          variant="outline"
-          className="flex-1 bg-slate-800/50 border-slate-700 text-white hover:bg-slate-700 hover:text-white"
-        >
-          <History className="h-4 w-4 mr-2" />
-          History
-        </Button>
-      </div>
-
-      {/* Emergency Alarm Button - Disabled */}
-      {/* <Button
+      {/* History button */}
+      <button
         onClick={(e) => {
           e.preventDefault();
-          triggerAlarm();
+          handleShowHistory();
         }}
-        disabled={isAlarmTriggering}
-        className="w-full bg-red-600 hover:bg-red-700 text-white font-semibold"
-        variant="destructive"
+        className="w-full flex items-center justify-center gap-1.5 px-3 py-1.5 text-[10px] border border-terminal-border text-muted-foreground hover:text-terminal-green hover:border-terminal-green-dim transition-colors"
       >
-        <AlertTriangle className="h-4 w-4 mr-2" />
-        {isAlarmTriggering ? 'Triggering...' : 'Emergency Alarm'}
-      </Button> */}
+        <History className="h-3 w-3" />
+        ./history
+      </button>
     </div>
   );
 }

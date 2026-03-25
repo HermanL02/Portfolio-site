@@ -1,10 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, MessageCircle, Minimize2 } from 'lucide-react';
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
-import { Button } from '@/components/ui/button';
-import { Input } from '@/components/ui/input';
+import { Send, Terminal, Minimize2 } from 'lucide-react';
 import { ScrollArea } from '@/components/ui/scroll-area';
 import { MarkdownRenderer } from '@/components/ui/markdown-renderer';
 
@@ -66,7 +63,7 @@ export function ChatbotModal() {
       console.error('Error:', error);
       setMessages([...updatedMessages, {
         role: 'assistant',
-        content: 'Sorry, I encountered an error. Please try again.'
+        content: 'ERROR: Connection failed. Please try again.'
       }]);
     } finally {
       setIsLoading(false);
@@ -82,102 +79,84 @@ export function ChatbotModal() {
 
   if (!isOpen) {
     return (
-      <Button
+      <button
         onClick={() => setIsOpen(true)}
-        size="icon"
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-14 w-14 rounded-full shadow-lg hover:scale-110 transition-all duration-300 z-50"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-12 w-12 flex items-center justify-center border border-terminal-green bg-[#090b09] text-terminal-green hover:bg-terminal-surface transition-colors z-50 glow-green"
         aria-label="Open chat"
       >
-        <MessageCircle size={24} />
-      </Button>
+        <Terminal size={20} />
+      </button>
     );
   }
 
   return (
-    <Card className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] max-w-96 h-[calc(100vh-2rem)] max-h-[600px] md:bottom-6 md:right-6 flex flex-col z-50 shadow-2xl overflow-hidden">
-      <CardHeader className="shrink-0 space-y-0 pb-3">
-        <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2">
-            <MessageCircle className="h-5 w-5" />
-            <div>
-              <CardTitle className="text-base">Ask about Herman</CardTitle>
-              <p className="text-xs text-muted-foreground">AI Assistant</p>
+    <div className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] max-w-96 h-[calc(100vh-2rem)] max-h-[600px] md:bottom-6 md:right-6 flex flex-col z-50 border border-terminal-green bg-[#090b09] overflow-hidden glow-green panel-enter">
+      {/* Title bar */}
+      <div className="shrink-0 flex items-center justify-between px-3 py-2 border-b border-terminal-border bg-[#0a0d0a]">
+        <div className="flex items-center gap-2">
+          <Terminal className="h-3.5 w-3.5 text-terminal-green" />
+          <span className="text-xs text-terminal-green font-bold">herman-ai</span>
+          <span className="text-[10px] text-muted-foreground">v1.0</span>
+        </div>
+        <button
+          onClick={() => setIsOpen(false)}
+          className="text-muted-foreground hover:text-terminal-green transition-colors p-1"
+          aria-label="Minimize chat"
+        >
+          <Minimize2 className="h-3.5 w-3.5" />
+        </button>
+      </div>
+
+      {/* Messages */}
+      <ScrollArea className="flex-1 h-full">
+        <div className="space-y-3 p-4">
+          {messages.map((message, index) => (
+            <div key={index}>
+              {message.role === 'user' ? (
+                <div className="flex items-start gap-2">
+                  <span className="text-terminal-amber text-xs shrink-0 pt-0.5">$</span>
+                  <p className="text-xs text-foreground">{message.content}</p>
+                </div>
+              ) : (
+                <div className="text-xs text-muted-foreground pl-4 border-l border-terminal-border">
+                  <MarkdownRenderer content={message.content} />
+                </div>
+              )}
             </div>
-          </div>
-          <Button
-            onClick={() => setIsOpen(false)}
-            variant="ghost"
-            size="icon"
-            className="h-8 w-8"
-            aria-label="Minimize chat"
+          ))}
+          {isLoading && (
+            <div className="pl-4 border-l border-terminal-border">
+              <span className="text-xs text-terminal-green">processing</span>
+              <span className="text-xs text-terminal-green cursor-blink">_</span>
+            </div>
+          )}
+          <div ref={messagesEndRef} />
+        </div>
+      </ScrollArea>
+
+      {/* Input */}
+      <div className="shrink-0 border-t border-terminal-border p-3">
+        <div className="flex items-center gap-2">
+          <span className="text-terminal-green text-xs shrink-0">$</span>
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            onKeyDown={handleKeyDown}
+            placeholder="ask about herman..."
+            disabled={isLoading}
+            className="flex-1 bg-transparent text-xs text-foreground placeholder:text-muted-foreground outline-none"
+          />
+          <button
+            onClick={handleSend}
+            disabled={isLoading || !input.trim()}
+            className="text-muted-foreground hover:text-terminal-green disabled:opacity-30 transition-colors"
+            aria-label="Send message"
           >
-            <Minimize2 className="h-4 w-4" />
-          </Button>
+            <Send className="h-3.5 w-3.5" />
+          </button>
         </div>
-      </CardHeader>
-
-      <CardContent className="flex-1 p-0 flex flex-col min-h-0">
-        <ScrollArea className="flex-1 h-full">
-          <div className="space-y-4 p-4">
-            {messages.map((message, index) => (
-              <div
-                key={index}
-                className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'}`}
-              >
-                <div
-                  className={`max-w-[85%] rounded-lg px-3 py-2 ${
-                    message.role === 'user'
-                      ? 'bg-primary text-primary-foreground'
-                      : 'bg-muted'
-                  }`}
-                >
-                  {message.role === 'user' ? (
-                    <p className="text-sm">{message.content}</p>
-                  ) : (
-                    <div className="text-sm">
-                      <MarkdownRenderer content={message.content} />
-                    </div>
-                  )}
-                </div>
-              </div>
-            ))}
-            {isLoading && (
-              <div className="flex justify-start">
-                <div className="bg-muted rounded-lg px-3 py-2">
-                  <div className="flex gap-1">
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                    <div className="w-2 h-2 bg-primary rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                  </div>
-                </div>
-              </div>
-            )}
-            <div ref={messagesEndRef} />
-          </div>
-        </ScrollArea>
-
-        <div className="shrink-0 border-t p-4">
-          <div className="flex gap-2">
-            <Input
-              type="text"
-              value={input}
-              onChange={(e) => setInput(e.target.value)}
-              onKeyDown={handleKeyDown}
-              placeholder="Ask about Herman's experience..."
-              disabled={isLoading}
-              className="flex-1"
-            />
-            <Button
-              onClick={handleSend}
-              disabled={isLoading || !input.trim()}
-              size="icon"
-              aria-label="Send message"
-            >
-              <Send className="h-4 w-4" />
-            </Button>
-          </div>
-        </div>
-      </CardContent>
-    </Card>
+      </div>
+    </div>
   );
 }

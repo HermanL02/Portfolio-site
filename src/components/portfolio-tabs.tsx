@@ -18,30 +18,44 @@ interface PortfolioTabsProps {
 
 export function PortfolioTabs({ data }: PortfolioTabsProps) {
   const [activeTab, setActiveTab] = useState('projects');
+  // Counter to force re-mount on tab switch, re-triggering stagger animations
+  const [switchCount, setSwitchCount] = useState(0);
+
+  const handleTabChange = (value: string) => {
+    setActiveTab(value);
+    setSwitchCount(c => c + 1);
+  };
 
   const tabs = [
-    { id: 'projects', label: '💼 Projects', component: <ProjectSection data={data.projects} /> },
-    { id: 'experience', label: '💼 Experience', component: <ExperienceSection data={data.experience} /> },
-    { id: 'tech-stack', label: '🧰 Tech Stack', component: <TechStackSection data={data.techStack} /> },
-    { id: 'current-work', label: '🔭 Current Work', component: <CurrentWorkSection data={data.currentWork} /> },
-    { id: 'learning', label: '🌱 Learning', component: <LearningSection data={data.learning} /> },
-    { id: 'education', label: '📚 Education', component: <EducationSection data={data.education} /> },
-    { id: 'journey', label: '🕰️ Journey', component: <JourneySection data={data.journey} /> },
-    { id: 'fun-facts', label: '✨ Fun Facts', component: <FunFactsSection data={data.funFacts} /> },
+    { id: 'projects', label: 'projects', component: <ProjectSection data={data.projects} /> },
+    { id: 'experience', label: 'experience', component: <ExperienceSection data={data.experience} /> },
+    { id: 'tech-stack', label: 'stack', component: <TechStackSection data={data.techStack} /> },
+    { id: 'current-work', label: 'current', component: <CurrentWorkSection data={data.currentWork} /> },
+    { id: 'learning', label: 'learning', component: <LearningSection data={data.learning} /> },
+    { id: 'education', label: 'edu', component: <EducationSection data={data.education} /> },
+    { id: 'journey', label: 'journey', component: <JourneySection data={data.journey} /> },
+    { id: 'fun-facts', label: 'facts', component: <FunFactsSection data={data.funFacts} /> },
   ];
 
   return (
-    <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-      <div className="w-full mb-10">
-        <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-300 p-2">
-          <TabsList className="grid w-full grid-cols-2 sm:grid-cols-4 lg:grid-cols-8 gap-2 bg-transparent">
+    <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
+      {/* Tab bar styled as terminal command options */}
+      <div className="w-full mb-8">
+        <div className="border border-terminal-border bg-[#090b09]">
+          <div className="flex items-center gap-1 px-3 py-1.5 border-b border-terminal-border text-xs text-muted-foreground">
+            <span className="text-terminal-green">$</span>
+            <span>herman</span>
+            <span className="text-terminal-amber">--section</span>
+            <span className="text-terminal-green">{activeTab}</span>
+          </div>
+          <TabsList className="flex w-full flex-wrap bg-transparent p-1 gap-0">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="text-xs lg:text-sm px-3 py-2.5 whitespace-nowrap rounded-xl data-[state=active]:bg-slate-700 data-[state=active]:text-white data-[state=inactive]:text-slate-700 data-[state=inactive]:hover:bg-slate-200 transition-all duration-200 font-medium"
+                className="text-xs px-3 py-1.5 text-muted-foreground data-[state=active]:text-terminal-green data-[state=active]:bg-terminal-surface data-[state=active]:border-terminal-border data-[state=active]:border data-[state=inactive]:border-transparent border hover:text-terminal-green-dim transition-colors rounded-none"
               >
-                {tab.label}
+                ./{tab.label}
               </TabsTrigger>
             ))}
           </TabsList>
@@ -49,8 +63,8 @@ export function PortfolioTabs({ data }: PortfolioTabsProps) {
       </div>
 
       {tabs.map((tab) => (
-        <TabsContent key={tab.id} value={tab.id} className="mt-0 animate-in fade-in-50 duration-300">
-          <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-sm border border-slate-300 p-8">
+        <TabsContent key={`${tab.id}-${switchCount}`} value={tab.id} className="mt-0">
+          <div className="border border-terminal-border bg-[#0a0d0a] p-6 sm:p-8 fade-up">
             {tab.component}
           </div>
         </TabsContent>
