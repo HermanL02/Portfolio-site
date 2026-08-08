@@ -4,6 +4,7 @@ import { useState } from 'react';
 import { MarkdownRenderer } from '@/components/ui/markdown-renderer';
 import { ProjectData } from '@/types';
 import { ExternalLink, Github } from 'lucide-react';
+import { Printed } from '@/components/ui/printed';
 
 interface ProjectSectionProps {
   data: ProjectData;
@@ -61,7 +62,7 @@ export function ProjectSection({ data }: ProjectSectionProps) {
     <div className="space-y-8">
       {/* Section header */}
       <div>
-        <h2 className="text-xl font-bold text-terminal-green mb-1">{data.title}</h2>
+        <h2 className="text-xl font-bold text-foreground mb-1">{data.title}</h2>
         <p className="text-xs text-muted-foreground">{filteredProjects.length} entries found</p>
       </div>
 
@@ -113,12 +114,11 @@ export function ProjectSection({ data }: ProjectSectionProps) {
           </button>
         </div>
       ) : (
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+      <Printed className="grid grid-cols-1 md:grid-cols-2 gap-4">
         {filteredProjects.map((project, index) => (
           <div
             key={index}
-            className="border border-terminal-border bg-terminal-surface-2 p-5 hover:border-terminal-green-dim transition-colors group terminal-line hover-lift"
-            style={{ animationDelay: `${index * 80}ms` }}
+            className="h-full border border-terminal-border bg-terminal-surface-2 p-5 hover:border-terminal-green-dim transition-colors group hover-lift"
           >
             {/* Project header */}
             <div className="flex items-start justify-between gap-3 mb-3">
@@ -169,7 +169,7 @@ export function ProjectSection({ data }: ProjectSectionProps) {
               {project.tag.split(', ').map((tag, tagIndex) => (
                 <span
                   key={tagIndex}
-                  className="text-[10px] px-1.5 py-0.5 border border-terminal-border text-terminal-green-dim"
+                  className="text-[10px] px-1.5 py-0.5 border border-terminal-border text-muted-foreground"
                 >
                   {tag.trim()}
                 </span>
@@ -177,7 +177,7 @@ export function ProjectSection({ data }: ProjectSectionProps) {
             </div>
           </div>
         ))}
-      </div>
+      </Printed>
       )}
     </div>
   );

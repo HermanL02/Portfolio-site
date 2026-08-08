@@ -11,7 +11,7 @@ export function BlogSection({ posts }: BlogSectionProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-bold text-terminal-green mb-1">Writing</h2>
+        <h2 className="text-xl font-bold text-foreground mb-1">Writing</h2>
         <p className="text-xs text-muted-foreground">
           {posts.length === 0
             ? 'No entries yet'
@@ -26,12 +26,11 @@ export function BlogSection({ posts }: BlogSectionProps) {
       ) : (
         <>
           <div className="space-y-4">
-            {posts.map((post, index) => (
+            {posts.map(post => (
               <Link
                 key={post.slug}
                 href={`/blog/${post.slug}`}
-                className="block border border-terminal-border bg-terminal-surface-2 p-5 transition-colors hover:border-terminal-green-dim group terminal-line"
-                style={{ animationDelay: `${index * 80}ms` }}
+                className="block border border-terminal-border bg-terminal-surface-2 p-5 transition-colors hover:border-terminal-green-dim group"
               >
                 <div className="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-xs text-muted-foreground">
                   <time dateTime={post.date}>{formatPostDate(post.date)}</time>
@@ -50,7 +49,7 @@ export function BlogSection({ posts }: BlogSectionProps) {
                     {post.tags.map(tag => (
                       <span
                         key={tag}
-                        className="border border-terminal-border px-1.5 py-0.5 text-[10px] text-terminal-green-dim"
+                        className="border border-terminal-border px-1.5 py-0.5 text-[10px] text-muted-foreground"
                       >
                         {tag}
                       </span>

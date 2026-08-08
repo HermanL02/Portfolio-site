@@ -5,6 +5,7 @@ import { ArrowLeft } from 'lucide-react';
 import { getAllPosts, getPost } from '@/lib/posts';
 import { formatPostDate } from '@/lib/format-date';
 import { PostBody } from '@/components/ui/post-body';
+import { ReadingProgress } from '@/components/ui/reading-progress';
 
 interface PageProps {
   params: Promise<{ slug: string }>;
@@ -46,6 +47,7 @@ export default async function BlogPost({ params }: PageProps) {
 
   return (
     <div className="min-h-screen bg-background dot-grid">
+      <ReadingProgress minutes={post.readingMinutes} />
       <article className="mx-auto max-w-3xl px-6 py-12 sm:px-8 sm:py-16">
         <Link
           href="/blog"
@@ -62,7 +64,7 @@ export default async function BlogPost({ params }: PageProps) {
             <span>{post.readingMinutes} min read</span>
           </div>
 
-          <h1 className="mt-3 text-2xl sm:text-[1.75rem] leading-tight font-bold text-terminal-green-bright tracking-tight">
+          <h1 className="mt-3 text-2xl sm:text-[1.75rem] leading-tight font-bold text-foreground tracking-tight">
             {post.title}
           </h1>
 
@@ -75,7 +77,7 @@ export default async function BlogPost({ params }: PageProps) {
               {post.tags.map(tag => (
                 <span
                   key={tag}
-                  className="border border-terminal-border px-1.5 py-0.5 text-[10px] text-terminal-green-dim"
+                  className="border border-terminal-border px-1.5 py-0.5 text-[10px] text-muted-foreground"
                 >
                   {tag}
                 </span>

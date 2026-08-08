@@ -9,7 +9,7 @@ export function ExperienceSection({ data }: ExperienceSectionProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-bold text-terminal-green mb-1">{data.title}</h2>
+        <h2 className="text-xl font-bold text-foreground mb-1">{data.title}</h2>
         <p className="text-xs text-muted-foreground">{data.items.length} positions</p>
       </div>
 
@@ -17,8 +17,7 @@ export function ExperienceSection({ data }: ExperienceSectionProps) {
         {data.items.map((experience, index) => (
           <div
             key={index}
-            className="border border-terminal-border bg-terminal-surface-2 p-5 hover:border-terminal-green-dim transition-colors terminal-line hover-lift"
-            style={{ animationDelay: `${index * 100}ms` }}
+            className="border border-terminal-border bg-terminal-surface-2 p-5 hover:border-terminal-green-dim transition-colors hover-lift"
           >
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">
               <div>
@@ -45,7 +44,7 @@ export function ExperienceSection({ data }: ExperienceSectionProps) {
               {experience.tag.split(', ').map((tag, tagIndex) => (
                 <span
                   key={tagIndex}
-                  className="text-[10px] px-1.5 py-0.5 border border-terminal-border text-terminal-green-dim"
+                  className="text-[10px] px-1.5 py-0.5 border border-terminal-border text-muted-foreground"
                 >
                   {tag.trim()}
                 </span>

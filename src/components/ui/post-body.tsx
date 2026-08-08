@@ -16,20 +16,20 @@ export function PostBody({ content }: { content: string }) {
         components={{
           // More space above a heading than below it, so sections group upward.
           h2: ({ children }) => (
-            <h2 className="mt-14 mb-4 text-lg font-bold text-terminal-green-bright">
+            <h2 className="mt-14 mb-4 text-lg font-bold text-foreground">
               <span className="text-terminal-green-dim select-none">## </span>
               {children}
             </h2>
           ),
           h3: ({ children }) => (
-            <h3 className="mt-10 mb-3 text-base font-bold text-terminal-green">
+            <h3 className="mt-10 mb-3 text-base font-bold text-foreground">
               <span className="text-terminal-green-dim select-none">### </span>
               {children}
             </h3>
           ),
           p: ({ children }) => <p className="my-4 max-w-[70ch]">{children}</p>,
           strong: ({ children }) => (
-            <strong className="font-bold text-terminal-green-bright">{children}</strong>
+            <strong className="font-bold text-foreground">{children}</strong>
           ),
           em: ({ children }) => <em className="italic text-muted-foreground">{children}</em>,
           a: ({ href, children }) => (
@@ -75,13 +75,13 @@ export function PostBody({ content }: { content: string }) {
               return <code className="font-mono text-[0.8125rem]">{children}</code>;
             }
             return (
-              <code className="bg-terminal-surface-3 text-terminal-green-bright px-1.5 py-0.5 text-[0.95em] font-mono">
+              <code className="bg-terminal-surface-3 text-foreground px-1.5 py-0.5 text-[0.95em] font-mono">
                 {children}
               </code>
             );
           },
           pre: ({ children }) => (
-            <pre className="my-6 overflow-x-auto border border-terminal-border bg-terminal-surface-2 p-4 text-terminal-green-bright">
+            <pre className="my-6 overflow-x-auto border border-terminal-border bg-terminal-surface-2 p-4 text-foreground">
               {children}
             </pre>
           ),
@@ -91,7 +91,7 @@ export function PostBody({ content }: { content: string }) {
             </div>
           ),
           thead: ({ children }) => (
-            <thead className="bg-terminal-surface-2 text-terminal-green">{children}</thead>
+            <thead className="bg-terminal-surface-2 text-foreground">{children}</thead>
           ),
           th: ({ children }) => (
             <th className="border-b border-terminal-border px-3 py-2 text-left font-bold whitespace-nowrap">

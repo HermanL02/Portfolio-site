@@ -9,7 +9,7 @@ export function LearningSection({ data }: LearningSectionProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-bold text-terminal-green mb-1">{data.title}</h2>
+        <h2 className="text-xl font-bold text-foreground mb-1">{data.title}</h2>
         <p className="text-xs text-muted-foreground">apt list --upgradable</p>
       </div>
 
@@ -17,8 +17,7 @@ export function LearningSection({ data }: LearningSectionProps) {
         {data.items.map((item, index) => (
           <div
             key={index}
-            className="flex items-start gap-3 px-4 py-3 border border-terminal-border bg-terminal-surface-2 hover:border-terminal-amber-dim transition-colors terminal-line"
-            style={{ animationDelay: `${index * 100}ms` }}
+            className="flex items-start gap-3 px-4 py-3 border border-terminal-border bg-terminal-surface-2 hover:border-terminal-amber-dim transition-colors"
           >
             <span className="text-terminal-amber text-xs shrink-0 pt-0.5">~&gt;</span>
             <MarkdownRenderer content={item} inline className="text-sm text-foreground" />

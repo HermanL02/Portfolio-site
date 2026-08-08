@@ -1,4 +1,5 @@
 import { MarkdownRenderer } from '@/components/ui/markdown-renderer';
+import { Printed } from '@/components/ui/printed';
 import { JourneyData } from '@/types';
 
 interface JourneySectionProps {
@@ -9,7 +10,7 @@ export function JourneySection({ data }: JourneySectionProps) {
   return (
     <div className="space-y-8">
       <div>
-        <h2 className="text-xl font-bold text-terminal-green mb-1">{data.title}</h2>
+        <h2 className="text-xl font-bold text-foreground mb-1">{data.title}</h2>
         <p className="text-xs text-muted-foreground">git log --oneline</p>
       </div>
 
@@ -18,9 +19,9 @@ export function JourneySection({ data }: JourneySectionProps) {
           {/* Timeline line */}
           <div className="absolute left-[7px] top-2 bottom-2 w-px bg-terminal-border" />
 
-          <div className="space-y-6">
+          <Printed className="space-y-6">
             {data.timeline.map((event, index) => (
-              <div key={index} className="relative flex items-start gap-4 terminal-line" style={{ animationDelay: `${index * 120}ms` }}>
+              <div key={index} className="relative flex items-start gap-4">
                 {/* Timeline dot */}
                 <div className="relative z-10 w-[15px] shrink-0 flex justify-center pt-1">
                   <div className="w-2.5 h-2.5 border border-terminal-green bg-terminal-surface" />
@@ -51,10 +52,10 @@ export function JourneySection({ data }: JourneySectionProps) {
                 </div>
               </div>
             ))}
-          </div>
+          </Printed>
         </div>
 
-        <div className="mt-8 pl-8 text-sm text-terminal-green-dim">
+        <div className="mt-8 pl-8 text-sm text-muted-foreground">
           <MarkdownRenderer content={data.footer} inline />
         </div>
       </div>

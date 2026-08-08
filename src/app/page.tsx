@@ -17,9 +17,10 @@ export default async function Home() {
         <div className="max-w-6xl mx-auto px-6 sm:px-8 lg:px-12 py-8 sm:py-12">
           <TerminalHeader />
 
-          <div className="fade-up" style={{ animationDelay: '1.4s' }}>
-            <PortfolioTabs data={data} />
-          </div>
+          {/* No entrance delay here on purpose. This block used to wait 1.4s
+              behind the header's typing animation, so the entire main column —
+              heading, tabs and every project — was blank on arrival. */}
+          <PortfolioTabs data={data} />
         </div>
       </main>
 

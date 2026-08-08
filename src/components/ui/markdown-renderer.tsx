@@ -17,7 +17,7 @@ export function MarkdownRenderer({ content, className, inline = false }: Markdow
             strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
             em: ({ children }) => <em className="italic">{children}</em>,
             code: ({ children }) => (
-              <code className="bg-terminal-surface-3 text-terminal-green-bright px-1.5 py-0.5 text-[0.95em] font-mono">{children}</code>
+              <code className="bg-terminal-surface-3 text-foreground px-1.5 py-0.5 text-[0.95em] font-mono">{children}</code>
             ),
             a: ({ href, children }) => (
               <a
@@ -48,7 +48,7 @@ export function MarkdownRenderer({ content, className, inline = false }: Markdow
           ol: ({ children }) => <ol className="list-decimal pl-4 space-y-1">{children}</ol>,
           li: ({ children }) => <li>{children}</li>,
           code: ({ children }) => (
-            <code className="bg-terminal-surface-3 text-terminal-green-bright px-1.5 py-0.5 text-[0.95em] font-mono">{children}</code>
+            <code className="bg-terminal-surface-3 text-foreground px-1.5 py-0.5 text-[0.95em] font-mono">{children}</code>
           ),
           a: ({ href, children }) => (
             <a

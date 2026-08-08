@@ -32,7 +32,7 @@ export default function BlogIndex() {
           <p className="text-xs text-muted-foreground">
             <span className="text-terminal-green">$</span> ls ~/blog
           </p>
-          <h1 className="mt-3 text-2xl font-bold text-terminal-green-bright tracking-tight">
+          <h1 className="mt-3 text-2xl font-bold text-foreground tracking-tight">
             Writing
           </h1>
           <p className="mt-2 max-w-[65ch] text-sm text-muted-foreground">
@@ -71,7 +71,7 @@ export default function BlogIndex() {
                       {post.tags.map(tag => (
                         <span
                           key={tag}
-                          className="border border-terminal-border px-1.5 py-0.5 text-[10px] text-terminal-green-dim"
+                          className="border border-terminal-border px-1.5 py-0.5 text-[10px] text-muted-foreground"
                         >
                           {tag}
                         </span>

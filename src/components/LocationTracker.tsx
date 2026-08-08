@@ -236,7 +236,7 @@ export function LocationTracker() {
         </div>
 
         <div className="space-y-1.5">
-          <div className="flex items-center gap-1.5 text-xs text-terminal-green-dim">
+          <div className="flex items-center gap-1.5 text-xs text-muted-foreground">
             <MapPin className="h-3 w-3" />
             <span>{locationData.name}</span>
           </div>

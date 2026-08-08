@@ -1,6 +1,7 @@
 import { IntroData } from '@/types';
 import { Mail, Linkedin, Globe, MapPin } from 'lucide-react';
 import { LocationTracker } from '@/components/LocationTracker';
+import { Printed } from '@/components/ui/printed';
 
 interface SidebarProps {
   data: IntroData;
@@ -9,7 +10,7 @@ interface SidebarProps {
 export function Sidebar({ data }: SidebarProps) {
   return (
     <div className="h-full bg-terminal-surface border-r border-terminal-border text-foreground p-6 lg:p-8 flex flex-col relative scanlines">
-      <div className="flex-1 flex flex-col justify-center space-y-10 relative z-10 sidebar-stagger">
+      <Printed className="flex-1 flex flex-col justify-center space-y-10 relative z-10">
         {/* System Info Header */}
         <div className="text-xs text-muted-foreground">
           <span className="text-terminal-green-dim">$</span>{' '}
@@ -18,10 +19,10 @@ export function Sidebar({ data }: SidebarProps) {
 
         {/* Identity */}
         <div>
-          <h1 className="text-[1.75rem] leading-tight font-bold text-terminal-green-bright tracking-tight">
+          <h1 className="text-[1.75rem] leading-tight font-bold text-foreground tracking-tight">
             {data.title}
           </h1>
-          <p className="mt-1.5 text-sm text-terminal-green-dim">
+          <p className="mt-1.5 text-sm text-muted-foreground">
             {data.subtitle}
           </p>
           {data.address && (
@@ -82,7 +83,7 @@ export function Sidebar({ data }: SidebarProps) {
 
           <div className="text-xs text-muted-foreground">{'}'}</div>
         </div>
-      </div>
+      </Printed>
 
       {/* Footer */}
       <div className="mt-8 pt-4 border-t border-terminal-border relative z-10">
