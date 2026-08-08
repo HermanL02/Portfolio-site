@@ -1,5 +1,7 @@
 title: "🔭 What I'm working on"
 items:
-  - "🧠 Building **AI-assisted coding tools**"
-  - "🧪 Creating reliable **DevOps pipelines** for secure delivery"
-  - "🌍 Developing **decentralized apps**" 
+  - "🏨 Architecting **Suitely's** vacation rental platform — B2B/B2C, ~200 properties"
+  - "🔌 Scaling **OTA/PMS channel integrations** (Mews, DerbySoft, Hostex, Expedia, Airbnb)"
+  - "📈 Building a multi-channel **dynamic pricing engine** across 450+ room types"
+  - "☸️ Running auto-scaled **Kubernetes (GKE)** services with async Pub/Sub processing"
+  - "🧠 Shipping **AI tooling** — chat booking assistant, review insights, conversation automation"
