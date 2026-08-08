@@ -10,9 +10,10 @@ import {
   EducationData, 
   CurrentWorkData, 
   LearningData, 
-  FunFactsData, 
-  JourneyData 
+  FunFactsData,
+  JourneyData
 } from '@/types';
+import { getAllPosts } from './posts';
 
 export async function loadAllData(): Promise<AllData> {
   const configDir = path.join(process.cwd(), 'config');
@@ -33,5 +34,6 @@ export async function loadAllData(): Promise<AllData> {
     learning: loadYaml('learning.yaml') as LearningData,
     funFacts: loadYaml('fun_facts.yaml') as FunFactsData,
     journey: loadYaml('journey.yaml') as JourneyData,
+    posts: getAllPosts(),
   };
 }

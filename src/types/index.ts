@@ -87,6 +87,22 @@ export interface JourneyData {
   footer: string;
 }
 
+/** A blog post's frontmatter, without the markdown body. */
+export interface PostMeta {
+  slug: string;
+  title: string;
+  description: string;
+  /** ISO date string, e.g. "2026-08-08". */
+  date: string;
+  tags: string[];
+  readingMinutes: number;
+}
+
+export interface Post extends PostMeta {
+  /** Raw markdown, frontmatter stripped. */
+  content: string;
+}
+
 export interface AllData {
   intro: IntroData;
   projects: ProjectData;
@@ -97,4 +113,5 @@ export interface AllData {
   learning: LearningData;
   funFacts: FunFactsData;
   journey: JourneyData;
+  posts: PostMeta[];
 }

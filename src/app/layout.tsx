@@ -8,8 +8,12 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
+  // Required so per-post `openGraph.url` and `alternates.canonical` resolve to
+  // absolute URLs; without it social crawlers get relative paths and drop the
+  // preview card entirely.
+  metadataBase: new URL("https://www.hermanyiqunliang.com"),
   title: "herman@portfolio:~$",
-  description: "Herman Liang — Full Stack Developer",
+  description: "Herman Liang — Platform & Full Stack Engineer",
   icons: {
     icon: [
       {

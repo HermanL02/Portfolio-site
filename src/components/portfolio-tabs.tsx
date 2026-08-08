@@ -11,6 +11,7 @@ import { CurrentWorkSection } from './sections/current-work-section';
 import { LearningSection } from './sections/learning-section';
 import { FunFactsSection } from './sections/fun-facts-section';
 import { JourneySection } from './sections/journey-section';
+import { BlogSection } from './sections/blog-section';
 
 interface PortfolioTabsProps {
   data: AllData;
@@ -28,6 +29,7 @@ export function PortfolioTabs({ data }: PortfolioTabsProps) {
 
   const tabs = [
     { id: 'projects', label: 'projects', component: <ProjectSection data={data.projects} /> },
+    { id: 'blog', label: 'blog', component: <BlogSection posts={data.posts} /> },
     { id: 'experience', label: 'experience', component: <ExperienceSection data={data.experience} /> },
     { id: 'tech-stack', label: 'stack', component: <TechStackSection data={data.techStack} /> },
     { id: 'current-work', label: 'current', component: <CurrentWorkSection data={data.currentWork} /> },
