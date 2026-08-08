@@ -147,7 +147,7 @@ export function LocationTracker() {
 
   if (isLoading) {
     return (
-      <div className="border border-terminal-border p-3">
+      <div className="border border-terminal-border bg-terminal-surface-2 p-3">
         <span className="text-xs text-muted-foreground">fetching location<span className="cursor-blink">_</span></span>
       </div>
     );
@@ -155,7 +155,7 @@ export function LocationTracker() {
 
   if (error || !locationData) {
     return (
-      <div className="border border-terminal-border p-3">
+      <div className="border border-terminal-border bg-terminal-surface-2 p-3">
         <span className="text-xs text-muted-foreground">{error || 'No location data'}</span>
       </div>
     );
@@ -164,7 +164,7 @@ export function LocationTracker() {
   if (showHistory) {
     return (
       <div className="space-y-2">
-        <div className="border border-terminal-border p-3">
+        <div className="border border-terminal-border bg-terminal-surface-2 p-3">
           <div className="flex items-center justify-between mb-3">
             <span className="text-xs font-bold text-terminal-amber flex items-center gap-1.5">
               <History className="h-3 w-3" />
@@ -185,7 +185,7 @@ export function LocationTracker() {
               {locationHistory.map((location) => (
                 <button
                   key={location._id}
-                  className="w-full text-left border border-terminal-border p-2 hover:border-terminal-green-dim transition-colors"
+                  className="w-full text-left border border-terminal-border bg-terminal-surface-2 p-2 hover:border-terminal-green-dim transition-colors"
                   onClick={() => {
                     const { latitude, longitude } = location.location_data;
                     window.open(
@@ -224,10 +224,10 @@ export function LocationTracker() {
       {/* Location display */}
       <button
         onClick={openMapLink}
-        className="w-full text-left border border-terminal-border p-3 hover:border-terminal-green-dim transition-colors"
+        className="w-full text-left border border-terminal-border bg-terminal-surface-2 p-3 hover:border-terminal-green-dim transition-colors"
       >
         {/* Map Preview */}
-        <div className="aspect-video mb-3 overflow-hidden bg-[#0a0a0a] relative">
+        <div className="aspect-video mb-3 overflow-hidden bg-terminal-surface-2 relative">
           <iframe
             src={`https://www.openstreetmap.org/export/embed.html?bbox=${locationData.location_data.longitude - 0.005},${locationData.location_data.latitude - 0.004},${locationData.location_data.longitude + 0.005},${locationData.location_data.latitude + 0.004}&layer=mapnik&marker=${locationData.location_data.latitude},${locationData.location_data.longitude}`}
             style={{ border: 0, width: '100%', height: '100%', pointerEvents: 'none', filter: 'hue-rotate(90deg) saturate(0.3) brightness(0.7)' }}

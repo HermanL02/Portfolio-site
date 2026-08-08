@@ -17,7 +17,7 @@ export function CurrentWorkSection({ data }: CurrentWorkSectionProps) {
         {data.items.map((item, index) => (
           <div
             key={index}
-            className="flex items-start gap-3 px-4 py-3 border border-terminal-border hover:border-terminal-green-dim transition-colors terminal-line"
+            className="flex items-start gap-3 px-4 py-3 border border-terminal-border bg-terminal-surface-2 hover:border-terminal-green-dim transition-colors terminal-line"
             style={{ animationDelay: `${index * 100}ms` }}
           >
             <span className="text-terminal-green text-xs shrink-0 pt-0.5">[{String(index).padStart(2, '0')}]</span>

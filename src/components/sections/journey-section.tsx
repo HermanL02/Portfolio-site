@@ -26,7 +26,7 @@ export function JourneySection({ data }: JourneySectionProps) {
                   <div className="w-2.5 h-2.5 border border-terminal-green bg-terminal-surface" />
                 </div>
 
-                <div className="flex-1 min-w-0 border border-terminal-border p-4 hover:border-terminal-green-dim transition-colors">
+                <div className="flex-1 min-w-0 border border-terminal-border bg-terminal-surface-2 p-4 hover:border-terminal-green-dim transition-colors">
                   <div className="flex items-center gap-3 mb-2">
                     <span className="text-xs text-terminal-amber font-bold">{event.year}</span>
                     <h3 className="text-sm font-bold text-foreground">

@@ -45,51 +45,93 @@
   --color-terminal-amber: #fbbf24;
   --color-terminal-amber-dim: #d97706;
   --color-terminal-cyan: #22d3ee;
-  --color-terminal-surface: #0f1a0f;
-  --color-terminal-border: #1a2e1a;
+
+  /* Elevation ramp — see :root for the derivation. Surfaces are named by
+     height, not by the component that happens to use them. */
+  --color-terminal-surface: var(--surface-1);
+  --color-terminal-surface-2: var(--surface-2);
+  --color-terminal-surface-3: var(--surface-3);
+  --color-terminal-border: var(--border);
+  --color-terminal-border-strong: var(--border-strong);
 }
 
+/* ── Elevation ramp ──
+   The previous theme put every surface within 1.05:1 of the page background,
+   so panels, sidebar and cards were literally the same brightness as the void
+   behind them and only near-invisible 1.35:1 borders implied any structure.
+   Contrast *ratio* is the wrong tool for adjacent dark planes — it compresses
+   badly near black — so these steps are spaced by perceptual lightness (CIE
+   L*) instead, ~5.5 L* apart, which is comfortably above the ~3 L* threshold
+   where a large area starts reading as a distinct plane.
+
+     surface-1  L* 11.0   panels, cards, sidebar
+     surface-2  L* 16.6   tab bar, inputs, hover
+     surface-3  L* 22.0   active / selected
+     border     L* 26.8   structural edges
+     border-strong L* 38.1  hover and emphasis
+
+   Hues carry a green tint that scales with lightness so the phosphor
+   character survives up the ramp instead of washing out to charcoal. */
 :root {
   --radius: 0.25rem;
-  --background: #0c0c0c;
-  --foreground: #d4d4d4;
-  --card: #111311;
-  --card-foreground: #d4d4d4;
-  --popover: #111311;
-  --popover-foreground: #d4d4d4;
+
+  --background: #081008;
+  --surface-1: #191f19;
+  --surface-2: #232b24;
+  --surface-3: #2e372f;
+  --border-strong: #505d51;
+
+  /* Body text 15.1:1, secondary 8.4:1 on the page background. The old
+     --muted-foreground (#737373) sat at 4.13:1 — under the 4.5:1 AA floor —
+     and was the sole cause of every failing text element on the site. It is
+     tinted green rather than neutral gray because it sits on tinted surfaces. */
+  --foreground: #dfe5df;
+  --muted-foreground: #9db09d;
+
+  --card: var(--surface-1);
+  --card-foreground: var(--foreground);
+  --popover: var(--surface-1);
+  --popover-foreground: var(--foreground);
   --primary: #4ade80;
-  --primary-foreground: #0c0c0c;
-  --secondary: #1a2e1a;
+  --primary-foreground: #081008;
+  --secondary: var(--surface-2);
   --secondary-foreground: #4ade80;
-  --muted: #1a1a1a;
-  --muted-foreground: #737373;
-  --accent: #1a2e1a;
-  --accent-foreground: #4ade80;
-  --destructive: #ef4444;
-  --border: #1a2e1a;
-  --input: #1a2e1a;
+  --muted: var(--surface-2);
+  --accent: var(--surface-3);
+  --accent-foreground: #86efac;
+  --destructive: #f87171;
+  --border: #384239;
+  --input: var(--surface-2);
   --ring: #4ade80;
   --chart-1: #4ade80;
   --chart-2: #22d3ee;
   --chart-3: #fbbf24;
   --chart-4: #a78bfa;
   --chart-5: #f87171;
-  --sidebar: #090b09;
-  --sidebar-foreground: #d4d4d4;
+  --sidebar: var(--surface-1);
+  --sidebar-foreground: var(--foreground);
   --sidebar-primary: #4ade80;
-  --sidebar-primary-foreground: #0c0c0c;
-  --sidebar-accent: #1a2e1a;
-  --sidebar-accent-foreground: #4ade80;
-  --sidebar-border: #1a2e1a;
+  --sidebar-primary-foreground: #081008;
+  --sidebar-accent: var(--surface-3);
+  --sidebar-accent-foreground: #86efac;
+  --sidebar-border: var(--border);
   --sidebar-ring: #4ade80;
 }
 
 @layer base {
   * {
-    @apply border-border outline-ring/50;
+    @apply border-border;
   }
   body {
     @apply bg-background text-foreground;
+  }
+
+  /* `outline-ring/50` only ever set a colour, never a width or style, so
+     keyboard focus was invisible everywhere. Phosphor green on the darkest
+     surface is 11.1:1, well past the 3:1 required for a focus indicator. */
+  :focus-visible {
+    outline: 2px solid var(--color-terminal-green);
+    outline-offset: 2px;
   }
 }
 
@@ -111,7 +153,7 @@
 
 /* Dot grid background pattern */
 .dot-grid {
-  background-image: radial-gradient(circle, #1a2e1a 1px, transparent 1px);
+  background-image: radial-gradient(circle, #1d251e 1px, transparent 1px);
   background-size: 24px 24px;
 }
 

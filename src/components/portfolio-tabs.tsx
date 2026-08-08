@@ -11,6 +11,7 @@ import { CurrentWorkSection } from './sections/current-work-section';
 import { LearningSection } from './sections/learning-section';
 import { FunFactsSection } from './sections/fun-facts-section';
 import { JourneySection } from './sections/journey-section';
+import { BlogSection } from './sections/blog-section';
 
 interface PortfolioTabsProps {
   data: AllData;
@@ -28,6 +29,7 @@ export function PortfolioTabs({ data }: PortfolioTabsProps) {
 
   const tabs = [
     { id: 'projects', label: 'projects', component: <ProjectSection data={data.projects} /> },
+    { id: 'blog', label: 'blog', component: <BlogSection posts={data.posts} /> },
     { id: 'experience', label: 'experience', component: <ExperienceSection data={data.experience} /> },
     { id: 'tech-stack', label: 'stack', component: <TechStackSection data={data.techStack} /> },
     { id: 'current-work', label: 'current', component: <CurrentWorkSection data={data.currentWork} /> },
@@ -41,19 +43,19 @@ export function PortfolioTabs({ data }: PortfolioTabsProps) {
     <Tabs value={activeTab} onValueChange={handleTabChange} className="w-full">
       {/* Tab bar styled as terminal command options */}
       <div className="w-full mb-8">
-        <div className="border border-terminal-border bg-[#090b09]">
+        <div className="border border-terminal-border bg-terminal-surface">
           <div className="flex items-center gap-1 px-3 py-1.5 border-b border-terminal-border text-xs text-muted-foreground">
             <span className="text-terminal-green">$</span>
             <span>herman</span>
             <span className="text-terminal-amber">--section</span>
             <span className="text-terminal-green">{activeTab}</span>
           </div>
-          <TabsList className="flex w-full flex-wrap bg-transparent p-1 gap-0">
+          <TabsList className="flex w-full flex-wrap bg-transparent p-1 gap-0.5">
             {tabs.map((tab) => (
               <TabsTrigger
                 key={tab.id}
                 value={tab.id}
-                className="text-xs px-3 py-1.5 text-muted-foreground data-[state=active]:text-terminal-green data-[state=active]:bg-terminal-surface data-[state=active]:border-terminal-border data-[state=active]:border data-[state=inactive]:border-transparent border hover:text-terminal-green-dim transition-colors rounded-none"
+                className="text-xs px-3 py-1.5 border border-transparent rounded-none transition-colors text-muted-foreground hover:text-terminal-green-bright hover:bg-terminal-surface-2 data-[state=active]:text-terminal-green-bright data-[state=active]:font-bold data-[state=active]:bg-terminal-surface-3 data-[state=active]:border-terminal-border-strong"
               >
                 ./{tab.label}
               </TabsTrigger>
@@ -64,7 +66,7 @@ export function PortfolioTabs({ data }: PortfolioTabsProps) {
 
       {tabs.map((tab) => (
         <TabsContent key={`${tab.id}-${switchCount}`} value={tab.id} className="mt-0">
-          <div className="border border-terminal-border bg-[#0a0d0a] p-6 sm:p-8 fade-up">
+          <div className="border border-terminal-border bg-terminal-surface p-6 sm:p-8 fade-up">
             {tab.component}
           </div>
         </TabsContent>
