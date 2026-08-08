@@ -17,7 +17,7 @@ export function EducationSection({ data }: EducationSectionProps) {
         {data.items.map((item: EducationItem, index: number) => (
           <div
             key={index}
-            className="border border-terminal-border p-5 hover:border-terminal-green-dim transition-colors terminal-line hover-lift"
+            className="border border-terminal-border bg-terminal-surface-2 p-5 hover:border-terminal-green-dim transition-colors terminal-line hover-lift"
             style={{ animationDelay: `${index * 100}ms` }}
           >
             <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-2 mb-3">

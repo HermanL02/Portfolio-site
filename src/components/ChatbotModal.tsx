@@ -11,7 +11,9 @@ interface Message {
 }
 
 export function ChatbotModal() {
-  const [isOpen, setIsOpen] = useState(true);
+  // Collapsed by default: expanded, this panel covers roughly a third of the
+  // desktop viewport and sits on top of the project grid.
+  const [isOpen, setIsOpen] = useState(false);
   const [messages, setMessages] = useState<Message[]>([
     {
       role: 'assistant',
@@ -81,8 +83,8 @@ export function ChatbotModal() {
     return (
       <button
         onClick={() => setIsOpen(true)}
-        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-12 w-12 flex items-center justify-center border border-terminal-green bg-[#090b09] text-terminal-green hover:bg-terminal-surface transition-colors z-50 glow-green"
-        aria-label="Open chat"
+        className="fixed bottom-4 right-4 md:bottom-6 md:right-6 h-12 w-12 flex items-center justify-center border border-terminal-green bg-terminal-surface text-terminal-green hover:bg-terminal-surface-3 hover:text-terminal-green-bright transition-colors z-50 glow-green"
+        aria-label="Ask Herman's AI assistant"
       >
         <Terminal size={20} />
       </button>
@@ -90,9 +92,9 @@ export function ChatbotModal() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] max-w-96 h-[calc(100vh-2rem)] max-h-[600px] md:bottom-6 md:right-6 flex flex-col z-50 border border-terminal-green bg-[#090b09] overflow-hidden glow-green panel-enter">
+    <div className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] max-w-96 h-[calc(100vh-2rem)] max-h-[600px] md:bottom-6 md:right-6 flex flex-col z-50 border border-terminal-green bg-terminal-surface overflow-hidden glow-green panel-enter">
       {/* Title bar */}
-      <div className="shrink-0 flex items-center justify-between px-3 py-2 border-b border-terminal-border bg-[#0a0d0a]">
+      <div className="shrink-0 flex items-center justify-between px-3 py-2 border-b border-terminal-border bg-terminal-surface-2">
         <div className="flex items-center gap-2">
           <Terminal className="h-3.5 w-3.5 text-terminal-green" />
           <span className="text-xs text-terminal-green font-bold">herman-ai</span>
@@ -136,7 +138,7 @@ export function ChatbotModal() {
 
       {/* Input */}
       <div className="shrink-0 border-t border-terminal-border p-3">
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 border border-transparent focus-within:border-terminal-green px-2 py-1 -mx-2 transition-colors">
           <span className="text-terminal-green text-xs shrink-0">$</span>
           <input
             type="text"

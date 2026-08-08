@@ -17,14 +17,14 @@ export function MarkdownRenderer({ content, className, inline = false }: Markdow
             strong: ({ children }) => <strong className="font-semibold">{children}</strong>,
             em: ({ children }) => <em className="italic">{children}</em>,
             code: ({ children }) => (
-              <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{children}</code>
+              <code className="bg-terminal-surface-3 text-terminal-green-bright px-1.5 py-0.5 text-[0.95em] font-mono">{children}</code>
             ),
             a: ({ href, children }) => (
               <a
                 href={href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="text-blue-600 hover:text-blue-800 underline"
+                className="text-terminal-cyan hover:text-terminal-green underline underline-offset-2"
               >
                 {children}
               </a>
@@ -48,14 +48,14 @@ export function MarkdownRenderer({ content, className, inline = false }: Markdow
           ol: ({ children }) => <ol className="list-decimal pl-4 space-y-1">{children}</ol>,
           li: ({ children }) => <li>{children}</li>,
           code: ({ children }) => (
-            <code className="bg-gray-100 px-1 py-0.5 rounded text-sm font-mono">{children}</code>
+            <code className="bg-terminal-surface-3 text-terminal-green-bright px-1.5 py-0.5 text-[0.95em] font-mono">{children}</code>
           ),
           a: ({ href, children }) => (
             <a
               href={href}
               target="_blank"
               rel="noopener noreferrer"
-              className="text-blue-600 hover:text-blue-800 underline"
+              className="text-terminal-cyan hover:text-terminal-green underline underline-offset-2"
             >
               {children}
             </a>
