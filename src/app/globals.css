@@ -39,12 +39,14 @@
   --radius-md: calc(var(--radius) - 2px);
   --radius-lg: var(--radius);
   --radius-xl: calc(var(--radius) + 4px);
-  --color-terminal-green: #4ade80;
-  --color-terminal-green-dim: #22c55e;
-  --color-terminal-green-bright: #86efac;
-  --color-terminal-amber: #fbbf24;
-  --color-terminal-amber-dim: #d97706;
-  --color-terminal-cyan: #22d3ee;
+  /* Green names are kept so existing markup keeps working, but they now point
+     at the action role rather than at a prose colour. */
+  --color-terminal-green: var(--action);
+  --color-terminal-green-dim: var(--action-dim);
+  --color-terminal-green-bright: var(--action-strong);
+  --color-terminal-amber: oklch(0.83 0.14 78);
+  --color-terminal-amber-dim: oklch(0.7 0.14 70);
+  --color-terminal-cyan: oklch(0.82 0.11 215);
 
   /* Elevation ramp — see :root for the derivation. Surfaces are named by
      height, not by the component that happens to use them. */
@@ -54,6 +56,28 @@
   --color-terminal-border: var(--border);
   --color-terminal-border-strong: var(--border-strong);
 }
+
+/* ── Colour roles ──
+   Green used to be the site's prose colour: 99 of 119 text usages against 20
+   neutral. Saturated green on near-black is tiring to read at length even when
+   the contrast ratio passes, because the problem is chroma, not luminance.
+   Here green stops being prose and becomes a role — action, prompt, focus,
+   selection, live status — which is both easier to read and how terminals
+   actually looked, with coloured prompts above light text.
+
+   Values are OKLCH so lightness and chroma move independently. Chroma falls as
+   lightness rises (accent 0.15 at L 0.80 → 0.105 at L 0.88 → 0.008 for prose
+   at L 0.935) rather than holding high chroma at the top of the ramp.
+
+   Every ink × surface pair below is >= 4.5:1. Hue 150 throughout, so the
+   phosphor cast survives in the neutrals.
+
+     ink            canvas  surface-1  surface-2  surface-3
+     foreground      16.0     13.9       12.1       10.2
+     muted            8.9      7.8        6.7        5.7
+     accent          10.9      9.5        8.2        7.0
+     accent-strong   13.9     12.1       10.5        8.9
+     accent-dim       7.3      6.4        5.5        4.7 */
 
 /* ── Elevation ramp ──
    The previous theme put every surface within 1.05:1 of the page background,
@@ -75,47 +99,53 @@
 :root {
   --radius: 0.25rem;
 
-  --background: #081008;
-  --surface-1: #191f19;
-  --surface-2: #232b24;
-  --surface-3: #2e372f;
-  --border-strong: #505d51;
+  --background: oklch(0.162 0.021 144.5);
+  --surface-1: oklch(0.231 0.014 145.1);
+  --surface-2: oklch(0.279 0.017 148.6);
+  --surface-3: oklch(0.326 0.019 148.3);
+  --border-strong: oklch(0.463 0.025 147.3);
 
-  /* Body text 15.1:1, secondary 8.4:1 on the page background. The old
-     --muted-foreground (#737373) sat at 4.13:1 — under the 4.5:1 AA floor —
-     and was the sole cause of every failing text element on the site. It is
-     tinted green rather than neutral gray because it sits on tinted surfaces. */
-  --foreground: #dfe5df;
-  --muted-foreground: #9db09d;
+  /* Action. Rare now, so it keeps force at lower chroma.
+     Named --action, not --accent: shadcn already owns --accent as a *surface*
+     token further down, and reusing the name silently overrode this one. */
+  --action: oklch(0.8 0.15 150);
+  --action-strong: oklch(0.88 0.105 150);
+  --action-dim: oklch(0.69 0.135 150);
+
+  /* Prose. Near-neutral with only a trace of the brand hue, so long-form text
+     carries no chroma load. The old --muted-foreground (#737373) sat at
+     4.13:1 — under the AA floor — and caused every failing text element. */
+  --foreground: oklch(0.935 0.008 150);
+  --muted-foreground: oklch(0.755 0.018 150);
 
   --card: var(--surface-1);
   --card-foreground: var(--foreground);
   --popover: var(--surface-1);
   --popover-foreground: var(--foreground);
-  --primary: #4ade80;
-  --primary-foreground: #081008;
+  --primary: var(--action);
+  --primary-foreground: var(--background);
   --secondary: var(--surface-2);
-  --secondary-foreground: #4ade80;
+  --secondary-foreground: var(--action);
   --muted: var(--surface-2);
   --accent: var(--surface-3);
-  --accent-foreground: #86efac;
-  --destructive: #f87171;
-  --border: #384239;
+  --accent-foreground: var(--action-strong);
+  --destructive: oklch(0.73 0.155 25);
+  --border: oklch(0.367 0.02 148);
   --input: var(--surface-2);
-  --ring: #4ade80;
-  --chart-1: #4ade80;
-  --chart-2: #22d3ee;
-  --chart-3: #fbbf24;
-  --chart-4: #a78bfa;
-  --chart-5: #f87171;
+  --ring: var(--action);
+  --chart-1: var(--action);
+  --chart-2: oklch(0.82 0.11 215);
+  --chart-3: oklch(0.83 0.14 78);
+  --chart-4: oklch(0.72 0.13 300);
+  --chart-5: oklch(0.73 0.155 25);
   --sidebar: var(--surface-1);
   --sidebar-foreground: var(--foreground);
-  --sidebar-primary: #4ade80;
-  --sidebar-primary-foreground: #081008;
+  --sidebar-primary: var(--action);
+  --sidebar-primary-foreground: var(--background);
   --sidebar-accent: var(--surface-3);
-  --sidebar-accent-foreground: #86efac;
+  --sidebar-accent-foreground: var(--action-strong);
   --sidebar-border: var(--border);
-  --sidebar-ring: #4ade80;
+  --sidebar-ring: var(--action);
 }
 
 @layer base {
@@ -135,11 +165,14 @@
   }
 }
 
-/* Subtle scanline effect */
+/* Subtle scanline effect.
+   Drifts by exactly one scanline period over 9s, which is enough to read as a
+   live phosphor surface and not enough to notice as movement. One transform on
+   one pseudo-element, so it composites without touching layout. */
 .scanlines::after {
   content: '';
   position: absolute;
-  inset: 0;
+  inset: -4px 0;
   background: repeating-linear-gradient(
     0deg,
     transparent,
@@ -149,11 +182,17 @@
   );
   pointer-events: none;
   z-index: 1;
+  animation: scanline-drift 9s linear infinite;
+}
+
+@keyframes scanline-drift {
+  from { transform: translateY(0); }
+  to   { transform: translateY(4px); }
 }
 
 /* Dot grid background pattern */
 .dot-grid {
-  background-image: radial-gradient(circle, #1d251e 1px, transparent 1px);
+  background-image: radial-gradient(circle, var(--surface-2) 1px, transparent 1px);
   background-size: 24px 24px;
 }
 
@@ -173,94 +212,21 @@
   animation: blink 1s step-end infinite;
 }
 
-/* ── Terminal line reveal (staggered per-item) ── */
-@keyframes terminal-line-in {
-  from {
-    opacity: 0;
-    transform: translateY(6px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* ── Motion ──
+   Component entrances, exits and sequencing live in Motion (src/lib/motion.ts)
+   rather than in keyframes here. That covers the tab-switch command sequence,
+   printed output, list stagger and the reading meter — all of which need
+   interruption, exit animations and a reduced-motion path that CSS cannot
+   express cleanly.
 
-.terminal-line {
-  opacity: 0;
-  animation: terminal-line-in 0.35s var(--ease-out-quart) forwards;
-}
-
-/* ── Fade-slide entrance (for larger blocks) ── */
-@keyframes fade-up {
-  from {
-    opacity: 0;
-    transform: translateY(12px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.fade-up {
-  opacity: 0;
-  animation: fade-up 0.5s var(--ease-out-expo) forwards;
-}
-
-/* ── Chatbot panel open/close ── */
-@keyframes panel-in {
-  from {
-    opacity: 0;
-    transform: scale(0.96) translateY(8px);
-  }
-  to {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-}
-
-@keyframes panel-out {
-  from {
-    opacity: 1;
-    transform: scale(1) translateY(0);
-  }
-  to {
-    opacity: 0;
-    transform: scale(0.96) translateY(8px);
-  }
-}
-
-.panel-enter {
-  animation: panel-in 0.3s var(--ease-out-expo) forwards;
-}
-
-/* ── Sidebar entrance stagger ── */
-@keyframes sidebar-item-in {
-  from {
-    opacity: 0;
-    transform: translateX(-8px);
-  }
-  to {
-    opacity: 1;
-    transform: translateX(0);
-  }
-}
-
-.sidebar-stagger > * {
-  opacity: 0;
-  animation: sidebar-item-in 0.4s var(--ease-out-quart) forwards;
-}
-
-.sidebar-stagger > *:nth-child(1) { animation-delay: 0.1s; }
-.sidebar-stagger > *:nth-child(2) { animation-delay: 0.2s; }
-.sidebar-stagger > *:nth-child(3) { animation-delay: 0.3s; }
-.sidebar-stagger > *:nth-child(4) { animation-delay: 0.4s; }
-.sidebar-stagger > *:nth-child(5) { animation-delay: 0.5s; }
-.sidebar-stagger > *:nth-child(6) { animation-delay: 0.6s; }
+   What stays in CSS is the ambient texture that never needs to be
+   interrupted or sequenced: the scanline drift above and the cursor blink. */
 
 /* ── Green glow for focused elements ── */
 .glow-green {
-  box-shadow: 0 0 8px rgba(74, 222, 128, 0.15), 0 0 20px rgba(74, 222, 128, 0.05);
+  box-shadow:
+    0 0 8px color-mix(in oklab, var(--action) 15%, transparent),
+    0 0 20px color-mix(in oklab, var(--action) 5%, transparent);
 }
 
 /* ── Hover lift on panels ── */
@@ -273,20 +239,19 @@
 
 /* ── Terminal text selection ── */
 ::selection {
-  background: rgba(74, 222, 128, 0.3);
-  color: #ffffff;
+  background: color-mix(in oklab, var(--action) 30%, transparent);
+  color: var(--foreground);
 }
 
-/* ── Reduced motion ── */
+/* ── Reduced motion ──
+   Covers the CSS-side ambient loops only. Motion components read the same
+   preference through useReducedMotion and resolve to their settled state, so
+   there is nothing here to force visible. */
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after {
     animation-duration: 0.01ms !important;
     animation-iteration-count: 1 !important;
     transition-duration: 0.01ms !important;
     animation-delay: 0ms !important;
-  }
-  .terminal-line, .fade-up, .sidebar-stagger > *, .panel-enter {
-    opacity: 1 !important;
-    transform: none !important;
   }
 }

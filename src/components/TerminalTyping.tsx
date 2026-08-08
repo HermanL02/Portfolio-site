@@ -1,10 +1,20 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useEffect, useRef, useState } from 'react';
+import {
+  animate,
+  motion,
+  useMotionValue,
+  useMotionValueEvent,
+  useReducedMotion,
+} from 'motion/react';
+import { TYPE_CPS } from '@/lib/motion';
 
 interface TerminalTypingProps {
   text: string;
-  speed?: number;
+  /** Characters per second. Defaults to the shared typing rate. */
+  cps?: number;
+  /** Seconds to wait before the first character. */
   delay?: number;
   onComplete?: () => void;
   className?: string;
@@ -12,50 +22,60 @@ interface TerminalTypingProps {
 
 export function TerminalTyping({
   text,
-  speed = 50,
-  delay = 300,
+  cps = TYPE_CPS,
+  delay = 0.15,
   onComplete,
   className = '',
 }: TerminalTypingProps) {
-  const [displayed, setDisplayed] = useState('');
-  const [started, setStarted] = useState(false);
+  const reduced = useReducedMotion();
+  const chars = useMotionValue(0);
+  const [count, setCount] = useState(0);
   const [done, setDone] = useState(false);
 
+  const complete = useRef(onComplete);
+  complete.current = onComplete;
+
+  useMotionValueEvent(chars, 'change', latest => setCount(Math.round(latest)));
+
   useEffect(() => {
-    // Check reduced motion preference
-    const prefersReduced = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (prefersReduced) {
-      setDisplayed(text);
-      setStarted(true);
+    if (reduced) {
+      setCount(text.length);
       setDone(true);
-      onComplete?.();
+      complete.current?.();
       return;
     }
 
-    const startTimer = setTimeout(() => setStarted(true), delay);
-    return () => clearTimeout(startTimer);
-  }, [delay, text, onComplete]);
+    const controls = animate(chars, text.length, {
+      duration: text.length / cps,
+      delay,
+      ease: 'linear',
+    });
 
-  useEffect(() => {
-    if (!started || done) return;
-
-    if (displayed.length < text.length) {
-      const timer = setTimeout(() => {
-        setDisplayed(text.slice(0, displayed.length + 1));
-      }, speed);
-      return () => clearTimeout(timer);
-    } else {
+    controls.then(() => {
       setDone(true);
-      onComplete?.();
-    }
-  }, [started, displayed, text, speed, done, onComplete]);
+      complete.current?.();
+    });
+
+    return () => controls.stop();
+  }, [text, cps, delay, reduced, chars]);
 
   return (
     <span className={className}>
-      {displayed}
-      {started && !done && (
-        <span className="text-terminal-green cursor-blink">_</span>
-      )}
+      {text.slice(0, count)}
+      {/* Always rendered so server and client markup match — `useReducedMotion`
+          resolves to null on the server, so branching on it here produced a
+          hydration mismatch. Visibility is carried by the animation instead. */}
+      <motion.span
+        aria-hidden="true"
+        className="ml-0.5 inline-block w-[0.5em] bg-terminal-green align-baseline"
+        style={{ height: '0.9em' }}
+        animate={done || reduced ? { opacity: 0 } : { opacity: [1, 1, 0, 0] }}
+        transition={
+          done || reduced
+            ? { duration: 0.12 }
+            : { duration: 1, times: [0, 0.5, 0.5, 1], repeat: Infinity, ease: 'linear' }
+        }
+      />
     </span>
   );
 }

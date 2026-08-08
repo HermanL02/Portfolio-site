@@ -92,12 +92,12 @@ export function ChatbotModal() {
   }
 
   return (
-    <div className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] max-w-96 h-[calc(100vh-2rem)] max-h-[600px] md:bottom-6 md:right-6 flex flex-col z-50 border border-terminal-green bg-terminal-surface overflow-hidden glow-green panel-enter">
+    <div className="fixed bottom-4 right-4 w-[calc(100vw-2rem)] max-w-96 h-[calc(100vh-2rem)] max-h-[600px] md:bottom-6 md:right-6 flex flex-col z-50 border border-terminal-green bg-terminal-surface overflow-hidden glow-green">
       {/* Title bar */}
       <div className="shrink-0 flex items-center justify-between px-3 py-2 border-b border-terminal-border bg-terminal-surface-2">
         <div className="flex items-center gap-2">
           <Terminal className="h-3.5 w-3.5 text-terminal-green" />
-          <span className="text-xs text-terminal-green font-bold">herman-ai</span>
+          <span className="text-xs text-foreground font-bold">herman-ai</span>
           <span className="text-[10px] text-muted-foreground">v1.0</span>
         </div>
         <button
