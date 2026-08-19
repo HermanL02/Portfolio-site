@@ -13,7 +13,7 @@ On 26 July 2026 an alert fired that I initially read as a pricing bug.
 
 StaySuitely sells hotel inventory across channels. A supplier called DerbySoft pushes us ARI (availability, rates and inventory) and we cache it in `derbysoft.derbysoftDailyRates`. Before a booking is confirmed we run a LiveCheck against the supplier to make sure the price we quoted is still the price they'll honour. That night, LiveCheck kept failing with `no_match`: our number and their number disagreed.
 
-The obvious explanation was that our price-sync allowlist had gone stale. It hadn't; the allowlist was fine. The cache was the stale thing, running anywhere from 30 minutes to four hours behind the supplier, so we were quoting prices from a world that no longer existed.
+The obvious explanation was that our price-sync allowlist had gone stale. It hadn't; the allowlist was fine. The cache was the stale thing — running anywhere from 30 minutes to four hours behind the supplier — so we were quoting prices from a world that no longer existed.
 
 That's a Pub/Sub backlog. So I went and looked at Pub/Sub, and this is where it got strange.
 
@@ -47,7 +47,7 @@ resultPromise.catch(() => {});
 
 In `MessageQueue._flush()` the send failure is caught with a comment explaining that it *"should never surface an error to the user level."* What happens instead is that the failure goes out on a `'debug'` event. That event is documented on the `Subscription` class, but it shows up in none of the getting-started samples; the canonical `listenForMessages.js` registers a single listener for `'message'`, and not even one for `'error'`.
 
-So a subscription whose every acknowledgement is failing looks completely healthy. There is no error event, no thrown exception, no nack, no log line, just an ack rate sitting near zero while messages redeliver forever.
+So a subscription whose every acknowledgement is failing looks completely healthy. There is no error event, no thrown exception, no nack, no log line — just an ack rate sitting near zero while messages redeliver forever.
 
 I attached the listener:
 
@@ -75,7 +75,7 @@ Deadline exceeded after 60.000s, remote_addr=74.125.132.95:443
 | `hostex-reservation-synced-wait-accept` | 27 |
 | `hostex-webhook-events-reservation-sync` | 7 |
 
-Six unrelated subscriptions, owned by different teams' worth of code, failing the same way at the same time. Whatever this was, it sat underneath all of them, which ruled out DerbySoft and ruled out ARI along with it.
+Six unrelated subscriptions, owned by different teams' worth of code, failing the same way at the same time. Whatever this was, it sat underneath all of them — which ruled out DerbySoft, and ruled out ARI along with it.
 
 ## The arithmetic
 
@@ -117,7 +117,7 @@ Which produces exactly the symptoms I'd been staring at:
 - `acknowledge` failing means the ack rate floors at approximately zero, so nothing ever leaves the subscription.
 - Both are swallowed by the SDK, so the whole failure mode is invisible.
 
-The service wasn't slow. It was doing the work, pulling messages, running handlers, computing correct results, and then silently failing to tell Pub/Sub about any of it, over a connection it had strangled with its own subscriptions.
+The service wasn't slow. It was doing the work — pulling messages, running handlers, computing correct results — and then silently failing to tell Pub/Sub about any of it, over a connection it had strangled with its own subscriptions.
 
 ### 100 is a tidier story than the truth
 
@@ -141,7 +141,7 @@ That is my entire incident, in three sentences, published years before I had it.
 
 None of it is anywhere I was going to look. Not the quickstart, not the sample everyone copies, and not any error message, warning, startup log or metric. Nothing counts your streams, nothing compares that count to 100, and nothing says a word when you cross the line or when you're at 95 and losing acks.
 
-The number 20 exists in the docs and nowhere in the runtime, and the runtime is where I was standing. Written down and never enforced means you meet a constraint for the first time during the incident.
+The number 20 exists in the docs and nowhere in the runtime — and the runtime is where I was standing. Written down and never enforced means you meet a constraint for the first time during the incident.
 
 ## Prior art: seven years of the same bug
 
@@ -151,7 +151,7 @@ I am not the first person here. This failure has a paper trail going back to 201
 
 > I just found this, and changing the `maxStreams` to `3` have fixed it for me. However I will leave this open as the error that was reported back then is no longer being surfaced - making it hard to figure out!
 
-A maintainer's conclusion, a year later: 20 subscribers in one client isn't unsupported, you're just running into gRPC's stream limit, "shared within one client (`PubSub` object)", and you might try breaking it into several clients. The issue is still open, and someone reported the same symptoms again in September 2025.
+A maintainer's conclusion, a year later: 20 subscribers in one client isn't unsupported, you're just running into gRPC's stream limit — "shared within one client (`PubSub` object)" — and you might try breaking it into several clients. The issue is still open, and someone reported the same symptoms again in September 2025.
 
 [#550](https://github.com/googleapis/nodejs-pubsub/issues/550) (March 2019) is 23 subscriptions in a single process throwing `Failed to "acknowledge" for 6 message(s). Reason: 4 DEADLINE_EXCEEDED`, while pods holding one or two subscriptions were perfectly fine. Their monitoring showed `num_undelivered_messages` climbing while `pull_ack_message_operation_count` stayed flat at zero, meaning acks weren't landing at all. Same signature, seven years earlier.
 
@@ -183,7 +183,7 @@ Nothing is lost by doing this. A single `streamingPull` stream sustains thousand
 
 The structural answer is more channels: multiple `PubSub` instances, or splitting the deployment so that fewer subscriptions live in one process. That's what the docs say and what the maintainer says in #7636.
 
-If you take that route in Node, verify that you actually got separate connections. `grpc-js` resolves subchannels through a process-global pool unless you opt out (`grpc.use_local_subchannel_pool` defaults to off), and its own comment is explicit that "subchannels with the exact same parameters will be reused". A subchannel is one HTTP/2 connection, so two `new PubSub({ projectId })` objects built identically are eligible to land on the same one, and therefore on the same 100-stream ceiling you were trying to escape. If you need certainty, give them differing channel arguments or set `'grpc.use_local_subchannel_pool': 1`.
+If you take that route in Node, verify that you actually got separate connections. `grpc-js` resolves subchannels through a process-global pool unless you opt out (`grpc.use_local_subchannel_pool` defaults to off), and its own comment is explicit that "subchannels with the exact same parameters will be reused". A subchannel is one HTTP/2 connection, so two `new PubSub({ projectId })` objects built identically are eligible to land on the same one — and therefore on the same 100-stream ceiling you were trying to escape. If you need certainty, give them differing channel arguments or set `'grpc.use_local_subchannel_pool': 1`.
 
 This is a difference between client libraries, so "rewrite it in Go" isn't the lesson either:
 
@@ -204,7 +204,7 @@ It was instant, in the way that only a real root cause ever is:
 
 And it stayed at zero for the next 21 hours.
 
-`DEADLINE_EXCEEDED` went from 230-per-six-minutes to zero while processing 1,433 messages in the same window, so that zero is a real load measurement and not silence from an idle service. The settled ack rate was 100% (468 acked of 468 sent) against an 11% baseline. Sent collapsed too, because there were no more redeliveries to inflate it.
+`DEADLINE_EXCEEDED` went from 230-per-six-minutes to zero — while processing 1,433 messages in the same window, so that zero is a real load measurement and not silence from an idle service. The settled ack rate was 100% (468 acked of 468 sent) against an 11% baseline. Sent collapsed too, because there were no more redeliveries to inflate it.
 
 ## Why the ack deadline experiments misled me
 
@@ -220,7 +220,7 @@ Unset was bad for its own reason. The SDK's adaptive default pins near 10 second
 
 But look at 600 s. Longer was dramatically worse, which makes no sense until you know about the stream exhaustion. With `modifyAckDeadline` blocked, the initial lease is all you ever get, so doubling it doesn't buy a retry. It just holds a doomed flow-control slot twice as long, and a slot only frees on ack or nack.
 
-(That 600 s row is thin, 315 acks in the window, so read it for direction and not magnitude. The direction held for as long as I watched it.)
+(That 600 s row is thin — 315 acks in the window — so read it for direction and not magnitude. The direction held for as long as I watched it.)
 
 That inversion was the clue I should have chased sooner. A knob that gets worse when you turn it in the "safe" direction usually means your model of the system is wrong.
 
@@ -263,4 +263,4 @@ And run the same multiplication over every other multiplexed client you own, whe
 
 ---
 
-The whole thing came down to one number being 100 and another number being 100. But the reason it took two days rather than two hours wasn't the arithmetic. It was that every instrument on the dashboard read normal while the pipeline sat completely still. The bug I actually needed to fix first was the missing `'debug'` listener, and everything after that was just multiplication.
+The whole thing came down to one number being 100 and another number being 100. But the reason it took two days rather than two hours wasn't the arithmetic — it was that every instrument on the dashboard read normal while the pipeline sat completely still. The bug I actually needed to fix first was the missing `'debug'` listener, and everything after that was just multiplication.

@@ -13,7 +13,7 @@ Our hotel inventory cache was running 4 hours behind the supplier.
 
 We were quoting guests prices from a world that no longer existed.
 
-I blamed DerbySoft. Then MongoDB. Then the Atlas cluster. Then my own flow-control settings, where I made it measurably worse and had to revert.
+I blamed DerbySoft. Then MongoDB. Then the Atlas cluster. Then my own flow-control settings — where I made it measurably worse, and had to revert.
 
 Every metric said the system was healthy:
 
@@ -39,7 +39,7 @@ We run 20 consumers.
 
 20 × 5 = 100.
 
-Exactly at the cap. The connection was fully saturated by its own message pulls, so `acknowledge` and `modifyAckDeadline`, unary RPCs that also need a stream, could never get one. They blocked until the 60-second gRPC deadline and failed, invisibly.
+Exactly at the cap. The connection was fully saturated by its own message pulls — so `acknowledge` and `modifyAckDeadline`, unary RPCs that also need a stream, could never get one. They blocked until the 60-second gRPC deadline and failed, invisibly.
 
 The fix was one line: maxStreams: 1.
 
