@@ -1,8 +1,16 @@
 ---
 title: "20 × 5 = 100: how an HTTP/2 stream cap silently stalled our message queue"
-description: "Our hotel inventory cache ran four hours behind the supplier. We blamed the vendor, the database, the cluster and our own code. The answer was an arithmetic accident inside a single gRPC connection — and a client library that hid it on purpose."
+description: "Our hotel inventory cache ran four hours behind the supplier. We blamed the vendor, the database, the cluster and our own code. The answer was an arithmetic accident inside a single gRPC connection — written down in exactly one place, enforced in none."
 date: "2026-08-08"
 tags: ["Pub/Sub", "gRPC", "HTTP/2", "Node.js", "Debugging", "GCP"]
+---
+
+**TL;DR**
+
+- **Symptom:** a `nodejs-pubsub` backlog climbing for hours, ack rate near zero, no errors, no restarts, CPU asleep.
+- **Cause:** 20 subscriptions × 5 `streamingPull` streams = 100 concurrent streams on the one HTTP/2 connection behind a single `PubSub` client — exactly its ceiling. `acknowledge` and `modifyAckDeadline` are unary RPCs and need a stream too. They never got one, blocked for 60 s, and failed with `DEADLINE_EXCEEDED` — which `@google-cloud/pubsub` swallows by design.
+- **Fix:** `streamingOptions: { maxStreams: 1 }` per subscription, and more than one `PubSub` client once you pass ~20 subscriptions. Backlog 1,820 → 0 in twenty minutes.
+
 ---
 
 On 26 July 2026 an alert fired that I initially read as a pricing bug.
@@ -41,7 +49,7 @@ Here's the part worth taking away even if you never touch Pub/Sub.
 resultPromise.catch(() => {});
 ```
 
-And in `MessageQueue._flush()`, the send failure is caught with a comment explaining that it *"should never surface an error to the user level."* Instead it's re-emitted on a `'debug'` event that nobody subscribes to, because nothing in the getting-started docs tells you to.
+And in `MessageQueue._flush()`, the send failure is caught with a comment explaining that it *"should never surface an error to the user level."* Instead it's re-emitted on a `'debug'` event — which is documented on the `Subscription` class, and appears in none of the getting-started samples. The canonical `listenForMessages.js` registers exactly one listener, `'message'`. Not even `'error'`.
 
 The consequence: a subscription whose every single acknowledgement is failing looks **completely healthy**. No error event. No thrown exception. No nack. No log line. Just an ack rate quietly sitting near zero while messages redeliver forever.
 
@@ -117,6 +125,52 @@ Which produces exactly the symptoms I'd been staring at:
 
 The service wasn't slow. It was doing the work — pulling messages, running handlers, computing correct results — and then failing to tell Pub/Sub about any of it, silently, on a connection it had strangled with its own subscriptions.
 
+### 100 is a tidier story than the truth
+
+Landing on exactly 100 makes a good headline, and it's slightly dishonest. Nineteen subscriptions is 95 streams, and 95 is already over a cliff: acks compete for the five streams left, most of them lose, and the pipeline degrades intermittently. That reads as flakiness. Flakiness gets a retry and a shrug, not an investigation.
+
+Hitting a round 20 was luck. It broke *completely*, and completely-broken is the only version of this bug that's findable.
+
+### One thing I never explained: publishing kept working
+
+`publish` is a unary RPC too. In v4 the `PublisherClient` and `SubscriberClient` are constructed from the same `PubSub` instance with the same gRPC channel arguments, so as far as I can tell they were eligible to sit on that same strangled connection — and yet publishing never stalled.
+
+My best guess is batching: a batch of messages is one RPC, we publish far less than we consume, so publish concurrency stayed low enough to catch a stream in the gaps between stream churn. I never proved it, and I'd rather leave the loose end visible than pretend the model is complete. If you're going to attack anything in this write-up, attack that.
+
+## It's documented. That didn't help at all.
+
+I want to be precise here, because "undocumented gotcha" would be the easy story and it isn't the true one.
+
+The constraint is written down, verbatim, in the `Subscription` class reference:
+
+> By default each `PubSub` instance can handle 100 open streams, with default options this translates to less than 20 Subscriptions per PubSub instance. If you wish to create more Subscriptions than that, you can either create multiple PubSub instances or lower the `options.streamingOptions.maxStreams` value on each Subscription object.
+
+That is my entire incident, in three sentences, published years before I had it. The same doc block also tells you to attach the `'debug'` handler, and — a few lines further down — suggests lowering `maxStreams` if you're seeing excessive redeliveries. The diagnostic and the fix are sitting in the same paragraph as the cause.
+
+And none of it is anywhere I was going to look. It isn't in the quickstart. It isn't in the sample that everyone copies. It isn't in an error message, a warning, a startup log, or a metric. Nothing counts your streams. Nothing compares that count to 100. Nothing says a word when you cross the line, or when you're at 95 and losing acks.
+
+**A constraint that is written down but not enforced is a constraint nobody finds — until it's an incident.** The number 20 exists in the docs and nowhere in the runtime, and the runtime is where I was standing.
+
+## Prior art: seven years of the same bug
+
+I am not the first person here, which is itself the point. This failure has a paper trail going back to 2018.
+
+**[nodejs-pubsub#1705](https://github.com/googleapis/google-cloud-node/issues/7636)** (April 2023, now tracked as `google-cloud-node#7636`) is titled *"Cannot listen to more than 20 subscriptions?"* The reporter spent two days on trial and error, then fixed it with `maxStreams: 3`. Their follow-up comment is the sharpest line in the thread:
+
+> I just found this, and changing the `maxStreams` to `3` have fixed it for me. However I will leave this open as the error that was reported back then is no longer being surfaced - making it hard to figure out!
+
+A maintainer's conclusion, a year later: 20 subscribers in one client isn't unsupported, you're just running into gRPC's stream limit, "shared within one client (`PubSub` object)" — try breaking it into several clients. The issue is still open. Someone reported the same symptoms again in September 2025.
+
+**[#550](https://github.com/googleapis/nodejs-pubsub/issues/550)** (March 2019) — 23 subscriptions in a single process, `Failed to "acknowledge" for 6 message(s). Reason: 4 DEADLINE_EXCEEDED`, while pods holding one or two subscriptions were perfectly fine. Their monitoring showed `num_undelivered_messages` climbing while `pull_ack_message_operation_count` sat flat at zero. Acks were not landing at all. Same signature, seven years earlier.
+
+**[#568](https://github.com/googleapis/nodejs-pubsub/issues/568)** (April 2019) — the same `DEADLINE_EXCEEDED` on both `acknowledge` and `modifyAckDeadline`, arriving in bursts.
+
+**[#240](https://github.com/googleapis/nodejs-pubsub/issues/240)** (September 2018) is where the root cause actually starts. Up to v0.18.0, acks travelled back up the `streamingPull` connection itself — the stream you already had. v0.19.0 moved them onto standalone unary `Acknowledge` RPCs, and the reporter watched "StreamingPull Acknowledge Requests" vanish from their dashboard and `DEADLINE_EXCEEDED` appear. The #550 reporter later confirmed that their 23 subscriptions had worked fine on 0.18.0.
+
+That change is the whole mechanism. Once acks need a stream of their own, a connection saturated by `streamingPull` starves them — and saturating it is the library's own default behaviour at twenty subscriptions.
+
+There's an uncomfortable trend in that timeline. In 2018 this threw an error you could see and crash on. Today it's caught, wrapped, and re-emitted on a channel nobody listens to. **The bug got harder to diagnose over time, not easier.**
+
 ## The fix is one line
 
 ```ts
@@ -130,6 +184,20 @@ this.subscription = this.pubsub.subscription(this.subscriptionName, {
 One stream per subscription. 20 streams instead of 100, leaving 80 free for unary RPCs.
 
 Nothing is lost by doing this. A single `streamingPull` stream sustains thousands of messages per second. This workload peaks around **300 per minute**. The default of 5 was buying us nothing and costing us everything.
+
+### What one line doesn't fix
+
+`maxStreams: 1` is headroom, not architecture. It buys a 5× multiplier on how many subscriptions fit — and the next twenty consumers spend it.
+
+The structural answer is **more channels**: multiple `PubSub` instances, or splitting the deployment so fewer subscriptions live in one process. That's what the docs say, and what the maintainer says in #7636.
+
+If you take that route in Node, **verify you actually got separate connections.** `grpc-js` resolves subchannels through a process-global pool unless you opt out — `grpc.use_local_subchannel_pool` defaults to off — and its own comment is explicit that "subchannels with the exact same parameters will be reused." A subchannel is one HTTP/2 connection. Two `new PubSub({ projectId })` objects built identically are eligible to land on the same subchannel, and therefore on the same 100-stream ceiling you were trying to escape. If you need certainty, give them differing channel arguments or set `'grpc.use_local_subchannel_pool': 1`.
+
+And this is a **client library** difference, not a language one — "rewrite it in Go" is the wrong lesson:
+
+- **Java**'s `Subscriber` hands its channel provider a pool sized to `parallelPullCount` and pins each stream to a channel with `setChannelAffinity(i)`. Default parallel pull count: 1. Twenty subscribers means twenty subscribers' worth of channels.
+- **Go**'s `pubsub.NewClient` dials with `option.WithGRPCConnectionPool(min(GOMAXPROCS, 4))` — "create multiple connections to increase throughput," in the source comment.
+- **Node** gives you one channel and lets you pile everything onto it.
 
 ## The cutover
 
@@ -160,11 +228,44 @@ Unset was bad for its own reason: the SDK's adaptive default pins near 10 second
 
 But look at 600 s. **Longer was dramatically worse**, which makes no sense until you know about the stream exhaustion. With `modifyAckDeadline` blocked, the initial lease is all you ever get. Doubling it doesn't buy you a retry — it just holds a doomed flow-control slot twice as long, and a slot only frees on ack or nack.
 
+(That 600 s row is thin — 315 acks in the window — so read it as direction rather than magnitude. The direction held for as long as I watched it.)
+
 That inversion was the clue I should have chased sooner. A knob that gets worse when you turn it in the "safe" direction usually means your model of the system is wrong.
+
+## How to catch this before it bites you
+
+Three things, in the order I'd do them.
+
+**1. Count your streams at startup and refuse to be surprised.** The runtime won't do this for you, so do it yourself, wherever you register consumers:
+
+```ts
+const DEFAULT_MAX_STREAMS = 5;
+const HTTP2_STREAM_LIMIT = 100;
+
+const budget = subscriptions.reduce(
+  (n, s) => n + (s.streamingOptions?.maxStreams ?? DEFAULT_MAX_STREAMS),
+  0,
+);
+
+if (budget > 60) {
+  logger.error(
+    `gRPC stream budget ${budget}/${HTTP2_STREAM_LIMIT} on one PubSub client — ` +
+      `lower maxStreams or split across PubSub instances`,
+  );
+}
+```
+
+60 is deliberately not 100. You want the warning while you still have room, not at the moment acks start losing races.
+
+**2. Attach the `'debug'` listener in every service. Today.** It costs one line and it is the difference between "the queue is stuck and nothing is wrong" and a screenful of `Failed to "ack" ... DEADLINE_EXCEEDED`. Do it before you need it.
+
+**3. Alert on ack rate, not on backlog.** `subscription/num_undelivered_messages` and `oldest_unacked_message_age` both count leased-but-unacked messages, so lease length pollutes them — a longer `ackDeadline` inflates both on a perfectly healthy system, and a stuck one looks like a busy one. Build the alert on `subscription/ack_message_count` against `subscription/sent_message_count`. Work leaving the system is the only thing that can't be faked.
+
+And then run the same multiplication over every other multiplexed client you own — Spanner, Bigtable, Firestore, your own gRPC services. The arithmetic is not specific to Pub/Sub.
 
 ## Three things I'd carry to any queue
 
-**A shared gRPC channel is a budget, and you are spending it without being told.** Any library that multiplexes over one connection — Pub/Sub, Spanner, Bigtable, your own gRPC services — has a stream ceiling. Multiply your per-client concurrency by your number of clients and compare it to 100 *before* it becomes an incident. Our number was exactly 100, which is the kind of coincidence that looks like sabotage.
+**A shared gRPC channel is a budget, and nothing in the runtime will tell you the balance.** Any library that multiplexes over one connection has a stream ceiling. Multiply your per-client concurrency by your number of clients and compare it to 100 *before* it becomes an incident. The number was in the docs the whole time — stated once, in a class reference, enforced nowhere. Documentation you have to already suspect in order to search for isn't a safety net.
 
 **"No errors" is not "no failures."** It means nothing at all until you've checked whether your client library catches its own. Pub/Sub does it deliberately and documents the intent in a code comment. Go and read how your critical libraries handle their own failures — and note that `ackWithResponse()` is *not* a workaround here: without exactly-once delivery enabled it short-circuits to `ack()` and returns `Success` unconditionally.
 
